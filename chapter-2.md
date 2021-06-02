@@ -1,4 +1,4 @@
-# Chapter 2: Hosting programming : fundamental data structures.
+# Chapter 2: Host programming : fundamental data structures.
 
 ## 2.1. Primitive data types
 
