@@ -4,6 +4,7 @@
 
 - Tại chương 2, ta đã biết cách tạo ra các `kernels` từ các `functions`, nhưng chưa đề cập tới việc set `arguments` cho các hàm. Hàm `clSetKernelArg` cho phép thực hiện điều đó.
 
+<a name="clSetKernelArg"></a>
 ```cpp
 clSetKernelArg (cl_kernel kernel, cl_uint index, size_t size, const void *value);
 ```
@@ -111,8 +112,10 @@ cl_buffer_region region;
 region.size = 40*sizeof(float);
 region.origin = 50*sizeof(float);
 
-sub_buffer = clCreateSubBuffer(main_buffer, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, CL_BUFFER_CREATE_TYPE_REGION, &region, &err);
+sub_buffer = clCreateSubBuffer(main_buffer, CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &region, &err);
 ```
+
+- `subbuffer` không allocate vùng nhớ riêng của nó để giữ data. Thay vào đó, nó truy cập vào cùng cùng nhớ của `main buffer`. Không cần thêm cờ `CL_MEM_COPY_HOST_PTR`.
 
 ## 3.3 Image objects
 
@@ -279,7 +282,7 @@ cl_device_id create_device() {
    if(err < 0) {
       perror("Couldn't identify a platform");
       exit(1);
-   } 
+   }
 
    /* Access a device */
    err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &dev, NULL);
@@ -288,8 +291,7 @@ cl_device_id create_device() {
    }
    if(err < 0) {
       perror("Couldn't access any devices");
-      exit(1);   
-   }
+      exit(1);   }
 
    return dev;
 }
@@ -307,46 +309,46 @@ int main() {
    void *main_buffer_mem = NULL, *sub_buffer_mem = NULL;
    size_t main_buffer_size, sub_buffer_size;
    cl_buffer_region region;
-   
+  
    /* Create device and context */
    device = create_device();
    context = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
    if(err < 0) {
       perror("Couldn't create a context");
-      exit(1);   
+      exit(1);  
    }
 
    /* Create a buffer to hold 100 floating-point values */
-   main_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | 
+   main_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY |
       CL_MEM_COPY_HOST_PTR, sizeof(main_data), main_data, &err);
    if(err < 0) {
       perror("Couldn't create a buffer");
-      exit(1);   
+      exit(1);  
    }
 
    /* Create a sub-buffer */
    /* Modified on 2/12/2014 to account for unaligned memory error */
-   region.origin = 0x100;
-   region.size = 20*sizeof(float);
-   sub_buffer = clCreateSubBuffer(main_buffer, CL_MEM_READ_ONLY |
-      CL_MEM_COPY_HOST_PTR, CL_BUFFER_CREATE_TYPE_REGION, &region, &err);
+   region.origin = 5*sizeof(float);
+   region.size = 30*sizeof(float);
+   sub_buffer = clCreateSubBuffer(main_buffer, CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &region, &err);
    if(err < 0) {
       perror("Couldn't create a sub-buffer");
-      exit(1);   
+      printf("\n\t%i\n", err);
+      exit(1);  
    }
 
    /* Obtain size information about the buffers */
-   clGetMemObjectInfo(main_buffer, CL_MEM_SIZE, 
+   clGetMemObjectInfo(main_buffer, CL_MEM_SIZE,
          sizeof(main_buffer_size), &main_buffer_size, NULL);
-   clGetMemObjectInfo(sub_buffer, CL_MEM_SIZE, 
+   clGetMemObjectInfo(sub_buffer, CL_MEM_SIZE,
          sizeof(sub_buffer_size), &sub_buffer_size, NULL);
    printf("Main buffer size: %lu\n", main_buffer_size);
    printf("Sub-buffer size:  %lu\n", sub_buffer_size);
-   
+  
    /* Obtain the host pointers */
-   clGetMemObjectInfo(main_buffer, CL_MEM_HOST_PTR, sizeof(main_buffer_mem), 
+   clGetMemObjectInfo(main_buffer, CL_MEM_HOST_PTR, sizeof(main_buffer_mem),
   	      &main_buffer_mem, NULL);
-   clGetMemObjectInfo(sub_buffer, CL_MEM_HOST_PTR, sizeof(sub_buffer_mem), 
+   clGetMemObjectInfo(sub_buffer, CL_MEM_HOST_PTR, sizeof(sub_buffer_mem),
   	      &sub_buffer_mem, NULL);
    printf("Main buffer memory address: %p\n", main_buffer_mem);
    printf("Sub-buffer memory address:  %p\n", sub_buffer_mem);
@@ -365,7 +367,7 @@ int main() {
 
 `Makefile`
 
-```cpp
+```Makefile
 PROJ=buffer_check
 
 CC=gcc
@@ -374,7 +376,7 @@ CFLAGS=-std=c99 -Wall -DUNIX -g -DDEBUG
 
 # Check for 32-bit vs 64-bit
 PROC_TYPE = $(strip $(shell uname -m | grep 64))
- 
+
 # Check for Mac OS
 OS = $(shell uname -s 2>/dev/null | tr [:lower:] [:upper:])
 DARWIN = $(strip $(findstring DARWIN, $(OS)))
@@ -430,11 +432,81 @@ clean:
 
 ## 3.5 Memory object transfer commands
 
+- OpenCL cung cấp nhiều hàm để `enqueue data transfer commands` chia ra làm 3 loại:
+  - Các hàm để khởi tạo `read/write data transfer`.
+  - Các hàm để `map/unmap memory`.
+  - Các hàm để `copy data` giữa các `memory objects`.
+
+- Các hàm này không tạo ra `memory objects` mới, mà chúng truy cập data từ `memory objecst` đã được truyền tới `devices` như một `kernel arguments`.
+
 ### 3.5.1 Read/write data transfer
+
+- Ta đã biết: để gửi một `memory objects` tới `devices` thì sử dụng [`clSetKernelArg`](#clSetKernelArg). Nhưng khi ta tạo ra một `write-only buffer object` để chứa `device's output`, sau khi kernel hoàn thành task vụ, làm thế nào để lấy buffer data trở lại `host`.
+
+- Có 6 hàm cho phép đọc và viết vào `memory objects`. `read` operation chuyển data từ `memory object` tới `host memory`. `write` operation chuyển data từ `host memory` tới `memory object`.
+
+
+|Functions that read and write memory objects|Purpose|
+|:---|---|
+|`clEnqueueReadBuffer(cl_command_queue queue, cl_mem buffer, cl_bool blocking, size_t offset, size_t data_size, void *ptr, cl_uint num_events, const cl_event *wait_list, cl_event *event)`|Reads data from a buffer object to host memory|
+|`clEnqueueWriteBuffer(cl_command_queue_queue, cl_mem buffer, cl_bool blocking, size_t offset, size_t data_size, const void *ptr, cl_uint num_events, const cl_event *wait_list, cl_event *event)`|Writes data from host memory to a buffer object|
+|`clEnqueueReadImage(cl_command_queue queue, cl_mem image, cl_bool blocking, const size_t origin[3], const size_t region[3], size_t row_pitch, size_t slice_pitch, void *ptr, cl_uint num_events, const cl_event *wait_list, cl_event *event)`|Reads data from an image object to host memory|
+|`clEnqueueWriteImage(cl_command_queue queue, cl_mem image, cl_bool blocking, const size_t origin[3], const size_t region[3], size_t row_pitch, size_t slice_pitch, const void * ptr, cl_uint num_events, const cl_event *event_wait_list, cl_event *event)`|Writes data from host memory to an image object|
+|`clEnqueueReadBufferRect(cl_command_queue_queue, cl_mem buffer, cl_bool blocking, const size_t buffer_origin[3], const size_t host_origin[3], const size_t region[3], size_t buffer_row_pitch, size_t buffer_slice_pitch, size_t host_row_pitch, size_t host_slice_pitch, void *ptr, cl_uint num_events, const cl_event *wait_list, cl_event *event)`|Reads a rectangular portion of data from a buffer  object to host memory|
+|`clEnqueueWriteBufferRect(cl_command_queue queue, cl_mem buffer, cl_bool blocking, const size_t buffer_origin[3], const size_t host_origin[3], const size_t region[3], size_t buffer_row_pitch, size_t buffer_slice_pitch, size_t host_row_pitch, size_t host_slice_pitch, void *ptr, cl_uint num_events, const cl_event *wait_list, cl_event *event)`|Writes a rectangular portion of data from host memory to a buffer object|
+
+- Trong từng hàm trên, hai argument quan trọng gồm: tham số `cl_mem` - xác định `memory objects` trên `device`, và `void` pointer tham chiếu tới `host memory`. Tham số boolean `blocking = CL_TRUE`, hàm sẽ không return nếu quá trình `read/write` chưa kết thúc. Còn nếu `blocking = CL_FALSE`, hàm sẽ enqueue lệnh `read/write` nhưng sẽ không chờ quá trình data transfer kết thúc. Các tham số còn lại xác định phần nào của `memory object` có thể được truy cập. `offset`: điểm bắt đầu của `buffer data` để `read/write`. `data_size`: số lượng dữ liệu tính từ `offset` cần được truyền.
+
+[<img src= "images/F3_3.png" width="522">]()
+
+- Các hàm `clEnqueueReadImage` và `clEnqueueWriteImage` có thêm 2 tham số là `orgin[3]` và `region[3]`. Hai mảng này xác định vùng hình chữ nhật của `image data` được truyền vào hoặc truyền ra `image object`. Trong đó: `origin[3] = [column, row, slice]` xác định vị trí của tọa độ điểm pixel đầu tiên, `region[3] = [width, height, depth]` xác định kích thước của vùng truy cập. (Đối với ảnh `2-d`: `origin = [column, row, 0]` và `region = [width, height, 0]`)
+
+[<img src= "images/F3_4.png" width="522">]()
+
+- Hai hàm cuối cùng: `clEnqueueReadBufferRect` và `clEnqueueWriteBufferRect` giúp chuyển dữ liệu vào ra `buffer objects`, nhưng chúng truy cập dữ liệu theo `rectangular regions` tương tự chuyển `image data`. Bên cạnh `region[3]`, `buffer_origin[3]` xác định điểm bắt đầu của `buffer object data` và `host_origin[3]` là điểm bắt đầu của dữ liệu trong `host memory`. Ngoài ra, ta còn phải xác định `row pitch` và `slide pitch` cho cả `host objects` và `buffer objects`, nhưng các tham số này có thể đặt bằng `0`.
+
+- `clEnqueueReadBufferRect` và `clEnqueueWriteBufferRect` thích hợp để chuyển dữ liệu nhiều chiều nhưng không liên quan tới ảnh. _Ví dụ: giả sử ta lưu một ma trận trong một `buffer object`, và ta muốn đọc một ma trận con vào `host memory`, khi đó `clEnqueueReadBufferRect` được sử dụng_.
+
+[<img src= "images/F3_5.png" width="522">]()
 
 ### 3.5.2 Mapping memory objects
 
+- Với `C/C++` thông thường, khi cần truy cập vào 1 file, ta thường đặt `file's content` vào một `process memory` và đọc hoặc sửa sử dụng `memory operations` - đây gọi là `memory-mapping`, nó thường cải thiện hiệu năng hơn so với `file I/O` thông thường.
+
+- OpenCL cung cấp một cơ chế tương tự để truy cập `memory objects`, thay cho phép `read/write` ở phần trước, ta có thể map một `memory object` trên device lên một `memory region` trên `host`.
+
+- Các hàm `enqueue commands` để `map/unmap memory objects`, Nhưng ta không nhất thiết phải map toàn bộ `memory object`. Đối với `buffer objects`, ta có thể truy cập bất kỳ `1-d region`. Với `image objects`, ta truy cập một `rectangular region`.
+
+- Đối với 2 hàm `clEnqueueMapBuffer` và `clEnqueueMapImage`, các hàm trả về một con trỏ `void *` - con trỏ này phục vụ 2 mục đích: nó xác định điểm bắt đầu của `mapped memory` ở trên `host`, bên cạnh đó nó để `clEnqueueUnmapMemObject` biết vùng nào để `unmap`.
+
+- 2 hàm map có một tham số `map_flags`: nó được sử dụng để cấu hình khả năng truy cập vào `mapped memory` trên `host`.
+   - `map_flags = CL_MAP_READ`: mapped-memory read-only.
+   - `map_flags = CL_MAP_WRITE`: mapped-memory read-only.
+   - `map_flags = CL_MAP_READ | CL_MAP_WRITE`: mapped-memory readable and writeable.
+
+- Làm việc với `memory-mapped` trong OpenCL bao gồm 3 bước: enqueue một `memory map operation` bằng cách gọi một trong 2 hàm: `clEnqueueMapBuffer` hoặc `clEnqueueMapImage`. Sau đó truyền data qua lại với `mapped memory` với hàm `memcpy`. Cuối cùng, unmap bằng hàm `clEnqueueUnmapMemObject`.
+
+|Functions that map and unmap memory objects|Purpose|
+|---|---|
+|`void* clEnqueueMapBuffer(cl_command_queue queue, cl_mem buffer, cl_bool blocking, cl_map_flags map_flags, size_t offset, size_t data_size, cl_uint num_events, const cl_event *wait_list, cl_event *event, cl_int *errcode_ret)`|Maps a region of a buffer object to host memory|
+|`void* clEnqueueMapImage(cl_command_queue queue, cl_mem image, cl_bool blocking, cl_map_flags map_flags, const size_t origin[3], const size_t region[3], size_t *row_pitch, size_t *slice_pitch, cl_uint num_events, const cl_event *wait_list, cl_event *event, cl_int *errcode_ret)`|Maps a rectangular region of an image object to host memory|
+|`int clEnqueueUnmapMemObject(cl_command_queue queue, cl_mem memobj, void *mapped_ptr, cl_uint num_events, const cl_event *wait_list, cl_event *event)`|Unmaps an existing memory object from host memory|
+
 ### 3.5.3 Copying data between memory objects
+
+- Ngoài các hàm giúp chuyển dữ liệu giữa `host memory` và `memory object`, thì OpenCL cung cấp các hàm trao đổi dữ liệu giữa các `memory objects`. Những hàm này cho phép ta copy dữ liệu giữa 2 `memory objects` trên một `device` cũng như giữa các `memory objects` trên các `devices` khác nhau.
+
+|Functions that copy data between memory object|Purpose|
+|---|---|
+|`clEnqueueCopyBuffer(cl_command_queue queue, cl_mem src_buffer, cl_mem dst_buffer, size_t src_offset, size_t dst_offset, size_t data_size, cl_uint num_events, const cl_event *wait_list, cl_event *event)`|Copies data from a source buffer object to a destination buffer object|
+|`clEnqueueCopyImage(cl_command_queue queue, cl_mem src_image, cl_mem dst_image, const size_t src_origin[3], const size_t dst_origin[3], const size_t region[3], cl_uint num_events, const cl_event *wait_list, cl_event *event)`|Copies data from a source image object to a destination image object|
+|`clEnqueueCopyBufferToImage(cl_command_queue queue, cl_mem src_buffer, cl_mem dst_image, size_t src_offset, const size_t dst_origin[3], const size_t region[3], cl_uint num_events, const cl_event *wait_list, cl_event *event)`|Copies data from a source buffer object to a destination image object|
+|`clEnqueueCopyImageToBuffer(cl_command_queue queue, cl_mem src_image, cl_mem dst_buffer, const size_t src_origin[3], const size_t region[3], size_t dst_offset, cl_uint num_events, const cl_event *wait_list, cl_event *event)`|Copies data from a source image object to a destination buffer object|
+|`clEnqueueCopyBufferRect(cl_command_queue queue, cl_mem src_buffer, cl_mem dst_buffer, const size_t src_origin[3], const size_t dst_origin[3], const size_t region[3], size_t src_row_pitch, size_t src_slice_pitch, size_t dst_row_pitch, size_t dst_slice_pitch, cl_uint num_events, const cl_event *wait_list, cl_event *event) `|Copies data from a rectangular region in a source buffer object to a rectangular region in a destination buffer object|
+
+- Hình 3.6 là một ví dụ minh hoạ cách map và copy các `memory objects`. Mục đích là tạo ra 2 `buffer objects` và copy nội dung của `Buffer 1` sang `Buffer 2` với `clEnqueueCopyBuffer`. Sau đó `clEnqueueMapBuffer` để map nội dung của `Buffer 2` và `host memory`. Và hàm `memcpy` giúp chuyển `mapped memory` thành một array.
+
+[<img src= "images/F3_6.png" width="522">]()
 
 ## 3.6 Data partitioning
 
