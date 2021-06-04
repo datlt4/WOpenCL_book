@@ -219,7 +219,7 @@ clGetImageInfo (cl_mem image, cl_image_info param_name, size_t param_value_size,
 ```
 
 |`cl_image_info`|Parameter value|Purpose|
-|:---:|:---:|---|f
+|:---:|:---:|---|
 |`CL_IMAGE_ELEMENT_SIZE`|`size_t`|Returns the bit size of the elements (pixels) that make up the image|
 |`CL_IMAGE_WIDTH`|`size_t`|Returns the pixel width|
 |`CL_IMAGE_HEIGHT`|`size_t`|Returns the pixel height|
