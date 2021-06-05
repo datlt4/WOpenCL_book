@@ -1,58 +1,28 @@
-PROJ=matvec
+SRCS= getInfo.h
+OBJS=getInfo.o
+EXEC=getInfo
 
-CC=gcc
+GCC ?= g++
+CCFLAGS := -std=c++11
 
-CFLAGS=-std=c99 -Wall -DUNIX -g -DDEBUG
+LDFLAGS += -ggdb3 -O2 -Wall -Wextra -pedantic -lOpenCL
 
-# Check for 32-bit vs 64-bit
-PROC_TYPE = $(strip $(shell uname -m | grep 64))
- 
-# Check for Mac OS
-OS = $(shell uname -s 2>/dev/null | tr [:lower:] [:upper:])
-DARWIN = $(strip $(findstring DARWIN, $(OS)))
+RM=rm -f
 
-# MacOS System
-ifneq ($(DARWIN),)
-	CFLAGS += -DMAC
-	LIBS=-framework OpenCL
+# Target rules
+all: build
 
-	ifeq ($(PROC_TYPE),)
-		CFLAGS+=-arch i386
-	else
-		CFLAGS+=-arch x86_64
-	endif
-else
+build: ${EXEC}
 
-# Linux OS
-LIBS=-lOpenCL
-ifeq ($(PROC_TYPE),)
-	CFLAGS+=-m32
-else
-	CFLAGS+=-m64
-endif
+%.o: %.cpp %.h
+	$(GCC) $(CCFLAGS) $(INCLUDES) -o $@ -c $<
 
-# Check for Linux-AMD
-ifdef AMDAPPSDKROOT
-   INC_DIRS=. $(AMDAPPSDKROOT)/include
-	ifeq ($(PROC_TYPE),)
-		LIB_DIRS=$(AMDAPPSDKROOT)/lib/x86
-	else
-		LIB_DIRS=$(AMDAPPSDKROOT)/lib/x86_64
-	endif
-else
-
-# Check for Linux-Nvidia
-ifdef NVSDKCOMPUTE_ROOT
-   INC_DIRS=. $(NVSDKCOMPUTE_ROOT)/OpenCL/common/inc
-endif
-
-endif
-endif
-
-$(PROJ): $(PROJ).c
-	$(CC) $(CFLAGS) -o $@ $^ $(INC_DIRS:%=-I%) $(LIB_DIRS:%=-L%) $(LIBS)
-
-.PHONY: clean
+${EXEC}: ${OBJS}
+	$(GCC) $(CCFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
-	rm $(PROJ)
+	${RM} ${EXEC} *.o 
+
+dist-clean:
+	$(RM) $(EXEC)
+
