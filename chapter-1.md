@@ -1,6 +1,6 @@
 [<img src= "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/OpenCL_logo.svg/1200px-OpenCL_logo.svg.png" width=522 alignment="center">]()
 
-# OPENCL
+# Introducing OpenCL
 
 - Abbreviation of Open computing language
 

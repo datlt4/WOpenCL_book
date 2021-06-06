@@ -1518,16 +1518,16 @@ __kernel void blank() {
 
 ## 2.8. Summary
 
-- You need a solid grasp of `platforms`, `devices`, `contexts`, `programs`, `kernels`, and `command queues`.
+- _You need a solid grasp of `platforms`, `devices`, `contexts`, `programs`, `kernels`, and `command queues`._
 
-- This chapter has focused on `host` applications, whose primary function involves sending `commands` to `devices`. `Host` applications usually start by creating one or more `cl_platform_id` data structures, each of which represents a vendor’s implementation of OpenCL. Then, using the platform or platforms, the application finds connected `devices`, which are represented by `cl_device_id` structures. The application can find information about these devices by calling `clGetDeviceInfo`, and once it has __*determined which devices to target*__, it combines them within a `cl_context`.
+- _This chapter has focused on `host` applications, whose primary function involves sending `commands` to `devices`. `Host` applications usually start by creating one or more `cl_platform_id` data structures, each of which represents a vendor’s implementation of OpenCL. Then, using the platform or platforms, the application finds connected `devices`, which are represented by `cl_device_id` structures. The application can find information about these devices by calling `clGetDeviceInfo`, and once it has __*determined which devices to target*__, it combines them within a `cl_context`._
 
-- Next, the application reads in source code or binary code that contains specifically marked functions called `kernel functions`. It uses this code to form a `cl_program` and then builds the `program` with `clBuildProgram`. This compiles the code for every device in the context, and once the program is built successfully, the host application creates `cl_kernels` for the functions contained inside.
+- _Next, the application reads in source code or binary code that contains specifically marked functions called `kernel functions`. It uses this code to form a `cl_program` and then builds the `program` with `clBuildProgram`. This compiles the code for every device in the context, and once the program is built successfully, the host application creates `cl_kernels` for the functions contained inside._
 
-- To enable communication with a device, the host application creates a `cl_command_queue`. It dispatches `commands` into this `queue`, and each `command` tells the `target device` to perform an operation. For example, `clEnqueueTask` sends a `kernel function` to the `device` for execution. Other commands tell the `device` to `transfer data` to and from the host.
+- _To enable communication with a device, the host application creates a `cl_command_queue`. It dispatches `commands` into this `queue`, and each `command` tells the `target device` to perform an operation. For example, `clEnqueueTask` sends a `kernel function` to the `device` for execution. Other commands tell the `device` to `transfer data` to and from the host._
 
-- `Host` development is a complicated topic, and don’t be concerned if the discussion doesn't make sense just yet. As you examine more code and start writing your own, dealing with these data structures will become second nature.
+- _`Host` development is a complicated topic, and don’t be concerned if the discussion doesn't make sense just yet. As you examine more code and start writing your own, dealing with these data structures will become second nature._
 
-- This chapter has explained how to write host applications that dispatch kernel functions to devices. But in practical applications, you need to deliver data to the connected devices. It takes an entire chapter to explain OpenCL data transfer and partitioning, and we’ll look at this next.
+- _This chapter has explained how to write host applications that dispatch kernel functions to devices. But in practical applications, you need to deliver data to the connected devices. It takes an entire chapter to explain OpenCL data transfer and partitioning, and we’ll look at this next._
 
 _cited: [OpenCL in Action How to Accelerate Graphics and Computations](https://www.manning.com/books/opencl-in-action) - Chapter 2 Host programming: fundamental data structures._

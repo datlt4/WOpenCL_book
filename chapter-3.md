@@ -510,10 +510,108 @@ clean:
 
 ## 3.6 Data partitioning
 
+- Khi triển khai một thuật toán với `OpenCL`, ta có thể phải xử lý một lượng lớn data. Điều này khiển việc phân vùng trở nên ưu tiên - vì phân phối `processing load` các tốt thì `computational tasks` càng kết thúc nhanh.
+
+- Ta đã biết cách phân chia dữ liệu giữa nhiều thiết bị, nhưng ta còn có thể phân vùng dữ liệu của mình hơn nữa. Hầu hết các thiết bị OpenCL đều chứa một số `processing element` và với mã phù hợp, ta có thể kiểm soát lượng dữ liệu mà mỗi `processing element` nhận được.
+
+- `clEnqueueNDRangeKernel` giống như `clEnqueueTask`: đặt một `kernel` trong một `command queue` để thực thi. Nhưng không giống như `clEnqueueTask`, `clEnqueueNDRangeKernel` cho phép ta kiểm soát cách `kernel execution` được phân phối giữa các tài nguyên xử lý của thiết bị.
+
+```cpp
+clEnqueueNDRangeKernel(cl_command_queue queue, cl_kernel kernel, cl_uint work_dims, const size_t *global_work_offset, const size_t *global_work_size, const size_t *local_work_size, cl_uint numevents, const cl_event *waitlist, cl_event *event)
+```
+where:
+> `work_dims`: số chiều của dữ liệu.<br>
+> `global_work_offset`: `global ID offsets` trong từng chiều.<br>
+> `global_work_size`: số lương `work-items` trong từng chiều.<br>
+> `local_work_size`: số lương `work-items` trong `work-group` trong từng chiều.
+
+### 3.6.1 Loops and work-items
+
+- Đối với `C/C++` truyền thống, khi ta xử lý một lượng lớn dữ liệu, ta thường phải sử dụng vòng lặp để lặp qua data (thậm chí là nested-loop). Qua từng vòng lặp, yêu cầu một phép cộng và một phép so sánh. Các phép so sánh là cực kỳ chậm đối với các thiết bị như GPU.
+
+```cpp
+for(i=0; i<Z; i++)
+{
+   for(j=0; j<Y; j++)
+   {
+      for(k=0; k<X; k++)
+      {
+         process(point[i][j][k]);
+      }
+   }
+}
+```
+
+- Một khía cạnh hấp dẫn của OpenCL là ta không cần phải cấu hình những vòng lặp này ở trong kernel, thay vào đó `kernel` chỉ cần thực thi code nằm trong vòng lặp trong cùn. Ta gọi từng `individual kernel execution` này là một `work-item`. Đối với ví dụ trên, `work item` chỉ bao gồm một hàm: `process(point[i][j][k])`.
+
+- Sự khác nhau giữa `kernel` và `work-item` là: `kernel` là một tập các `task` được thực thi trên dữ liệu. Còn `work-item` là một phép triển khai của một `kernel` trên một tập dữ liệu nhất định. Mỗi `kernel` có thể là nhiều `work-item`. Trong ví dụ trên `process(point[i][j][k])` là một `kernel`, còn `process(point[1][2][3])` là một `work-item`.
+
+- Mảng `{i, j k}` được gọi là `global ID` của `work-item`. Nó xác định `work-item` duy nhất cho phép truy cập dữ liệu phải xử lý. Sau khi một `work-item` thực thi xong, một `work-item` mới sẽ được thực thi với `global ID` khác.
+
+- Số  phần tử của `global ID` tương ứng với số chiều của dữ liệu - tham số truyền vào `work_dims` của `clEnqueueNDRangeKernel`. Số chiều bé là `1` và lớn nhất phụ thuộc vào thiết bị. Có thể truy vấn bằng cách gọi hàm `clGetDeviceInfo` với tham số `CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS`
+
+```cpp
+int i = get_global_id(0);
+int j = get_global_id(1);
+int k = get_global_id(2);
+process(point[i][j][k]);
+```
+
 ### 3.6.2 Work sizes and offsets
+
+- Phần bên phải của `hình 3.7` biểu diễn `index space`.
+- `index space` bao gồm tất cả các tổ hợp của các chỉ số, nếu có `N` chỉ số khác nhau trong vòng lặp, thì ta có `index space` N-d.
+
+- Tham số `global_work_size` của hàm `clEnqueueNDRangeKernel` xác định số lượng `work-items` cần được xử lý theo từng chiều. Trong `hình 3.7`, vòng lặp trong cùng chạy từ `k=3` đến `k=11`, nên có `9 work-items` trên `k-direction`. Tương tự, có `6 work-items` theo trục `j-direction` và `4 work-items` theo trục `i-direction`. Do đó, ta sẽ đặt `global_work_sizes = {4, 6, 9}`.
+
+[<img src= "images/F3_7.png" width="622">]()
 
 ### 3.6.3 A simple one-dimensional example
 
+- Xét ví dụ `hình 3.8`, ứng dụng OpenCL thực hiện nhân một vector với một matrix và tạo ra một vector. `hình 3.8` mô tả một `buffer object` chứa data và cách dữ liệu của nó được phân vùng thành `4 work-items`.
+
+- Phép nhân `matrix-vector` bao gồm 4 `dot products`: và thực hiện phép nhân với `4 work-items`.
+
+```cpp
+work_items_per_kernel = 4;
+clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &workitemsperkernel, NULL, 0, NULL, NULL);
+```
+
+- Điều này thông báo cho OpenCL rằng, dữ liệu được phân vùng thành từng `single dimension` và `4 work-items` cần được tạo để thực hiện trong kernel.
+
+- Bên phía `kernel`, từng `work-item` kiểm tra `global ID` và truy cập từng dòng của matrix. thực hiện nhân một hàng `1x4`) với một vector `4x1` sử dụng hàm `dot`.
+
+```cpp
+int i = get_global_id(0);
+result[i] = dot(matrix[i], vector[0]);
+```
+
+[<img src= "images/F3_8.png" width="622">]()
+
 ### 3.6.4 Work-groups and compute units
 
+- `work-group` là một tổ hợp của các `work-items` - cái mà truy cập vào cùng `processing resources`. Trong lập trình, `work-groups` cung cấp 2 ưu điểm:
+   - Các `work-items` trong một `work-groups` có thể truy cập vào cùng một `block of high-speed memory` (được gọi là `local memory`).
+   - Các `work-items` trong một `work-groups` có thể được đồng bộ sử dụng `fences` và `barriers`.
+
+- Bên cạnh `global ID`, từng `work-item` có một `local ID` để phân biệt nó với các `work-items` khác trong `work-group`. Số `work-items` trong `work-group` được đặt thông qua tham số `local_work_size` của hàm `clEnqueueNDRangeKernel`.
+
+- Ví dụ với `hình 3.7`, ta sẽ tạo các `work-groups` từ các `2-d slices`. Có `4-slices` nên ta có `4 work-groups`. Và từng `work-groups` bao gồm `6 work-items` theo trục `j-direction` và `9 work-items` theo trục `k-direction`. Do đó, ta sẽ đặt tham số `local_work_size={0, 6, 9}`
+
+- Trong `OpenCL`, `processing resources` có khả năng hỗ trợ `work-group` được gọi là `compute unit`. Mỗi `work-group` thực thi trên một `compute unit` và mỗi `compute unit` chỉ thực thi `work-group` tại một thời điểm.
+
+- Ta không cần phải tạo `work-group`. Nếu đặt `local_work_size=NULL`, `OpenCL` sẽ quyết định cách tốt nhất để phân phối các `work-items` giữa các `processing elements` của thiết bị.
+
+[<img src= "images/F3_9.png" width="622">]()
+
 ## 3.7 Summary
+
+- _OpenCL provides a memory object (`cl_mem`) data structure as a standard mechanism for transferring data between a `host` and a `device`. The process of transferring memory objects is simple: create a `memory object` from existing data, and call `clSetKernelArg` to make the object into a `kernel argument`. When the kernel executes, the kernel will be able to access its data as a regular function parameter. Then, as the host sends further commands, the `device` may transfer data to the `host` or copy the data to another `buffer object`._
+
+- _There are two types of `memory objects`. `Buffer objects` store general data in a single dimension, and `image objects store` formatted pixel data in two or three dimensions. For both types, OpenCL provides functions that enqueue data transfer commands. `Read/ write` functions transfer data between a `memory object` and a `host`, but you can usually improve performance by `mapping` the memory object’s memory to host memory._
+
+- _The last part of this chapter discussed data partitioning, which is crucial for any OpenCL application that demands high performance. The basic unit of work is the `work-item`, which corresponds to the code executed within a traditional C/C++ loop. Each `work-item` receives a global ID that allows it to access data specifically intended for it. If `work-items` require synchronization, they can be placed into `work-groups`. Each `work-group` executes on a single `compute unit` on the `device`._
+
+- _This chapter, in conjunction with chapter 2, has explained almost everything you need to know about host applications. The only topics that remain to be covered are synchronization, event-processing, and threads, which will be discussed in chapter 7. In the next chapter, we’ll depart from host programming and launch our discussion of kernel development_
+
+_cited: [OpenCL in Action How to Accelerate Graphics and Computations](https://www.manning.com/books/opencl-in-action) - Chapter 2 Host programming: fundamental data structures._
