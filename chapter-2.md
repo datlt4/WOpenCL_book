@@ -40,9 +40,6 @@ where:
 
 - `platforms` và `num_platforms` có thể được set bằng `NULL`. Thường sử dụng trong trường hợp: đầu tiên sẽ tìm "how many platforms are installed" (`platforms = NULL` và `num_platforms` sẽ lưu số platforms đã được cài đặt). Sau đó khởi tạo tất cả các platforms (`num_platforms = NULL`).
 
-<details>
-  <summary>The following code shows how this is accomplished!</summary>
-
 ```Cpp
 cl_platform_id *platforms;
 cl_uint num_platforms;
@@ -53,8 +50,6 @@ platforms = (cl_platform_id*) malloc(sizeof(cl_platform_id) * num_platforms);
 
 clGetPlatformIDs(num_platforms, platforms, NULL);
 ```
-
-</details>
 
 <a name="obtaining_platform_information"></a>
 ### 2.2.2. Obtaining platform information
