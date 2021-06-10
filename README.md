@@ -6,7 +6,7 @@ Reference:
 
 # Part 1: Foundations of OpenCL programming
 
-## Chapter 1: Introducing OpenCL
+## [Chapter 1: Introducing OpenCL](chapter-1.md)
 
 - 1.1 The dawn of OpenCL
 - [1.2 Why OpenCL?](chapter-1.md/#Introducing-OpenCL)
@@ -20,54 +20,55 @@ Reference:
 - 1.7 Summary
 
 
-## Chapter 2: Host programming: fundamental data structures
-- 2.1 Primitive data types
-- 2.2 Accessing platforms
-    - 2.2.1 Creating platform structures
-    - 2.2.2 Obtaining platform information
-    - 2.2.3 Code example: testing platform extensions
-- 2.3 Accessing installed devices
-    - 2.3.1 Creating device structures
-    - 2.3.2 Obtaining device information
-    - 2.3.3 Code example: testing device extensions
-- 2.4 Managing devices with contexts
-    - 2.4.1 Creating contexts
-    - 2.4.2 Obtaining context information
-    - 2.4.3 Contexts and the reference count
-    - 2.4.4 Code example: checking a context’s reference count
-- 2.5 Storing device code in programs
-    - 2.5.1 Creating programs
-    - 2.5.2 Building programs
-    - 2.5.3 Obtaining program information
-    - 2.5.4 Code example: building a program from multiple source files
-- 2.6 Packaging functions in kernels
-    - 2.6.1 Creating kernels
-    - 2.6.2 Obtaining kernel information
-    - 2.6.3 Code example: obtaining kernel information
-- 2.7 Collecting kernels in a command queue
-    - 2.7.1 Creating command queues
-    - 2.7.2 Enqueuing kernel execution commands
-- 2.8 Summary
+## [Chapter 2: Host programming: fundamental data structures](chapter-2.md#chapter-2-host-programming--fundamental-data-structures)
+- [2.1 Primitive data types](chapter-2.md#21-primitive-data-types)
+- [2.2 Accessing platforms](chapter-2.md#22-accessing-platforms)
+    - [2.2.1 Creating platform structures](chapter-2.md#221-creating-platform-structures)
+    - [2.2.2 Obtaining platform information](chapter-2.md#222-obtaining-platform-information)
+    - [2.2.3 Code example: testing platform extensions](chapter-2.md#223-code-example-testing-platform-extensions)
+- [2.3 Accessing installed devices](chapter-2.md#23-accessing-installed-devices)
+    - [2.3.1 Creating device structures](chapter-2.md#231-creating-device-structures)
+    - [2.3.2 Obtaining device information](chapter-2.md#232-obtaining-device-information)
+    - [2.3.3 Code example: testing device extensions](chapter-2.md#233-code-example-testing-device-extensions)
+- [2.4 Managing devices with contexts](chapter-2.md#24-managing-devices-with-contexts)
+    - [2.4.1 Creating contexts](chapter-2.md#241-creating-contexts)
+    - [2.4.2 Obtaining context information](chapter-2.md#242-obtaining-context-information)
+    - [2.4.3 Contexts and the reference count](chapter-2.md#243-contexts-and-the-reference-count)
+    - [2.4.4 Code example: checking a context’s reference count](chapter-2.md#244-code-example-checking-a-contexts-reference-count)
+- [2.5 Storing device code in programs](chapter-2.md#25-storing-device-code-in-programs)
+    - [2.5.1 Creating programs](chapter-2.md#251-creating-programs)
+    - [2.5.2 Building programs](chapter-2.md#252-building-programs)
+    - [2.5.3 Obtaining program information](chapter-2.md#253-obtaining-program-information)
+    - [2.5.4 Code example: building a program from multiple source files](chapter-2.md#254-code-example-building-a-program-from-multiple-source-files)
+- [2.6 Packaging functions in kernels](chapter-2.md#26-packaging-functions-in-kernels)
+    - [2.6.1 Creating kernels](chapter-2.md#261-creating-kernels)
+    - [2.6.2 Obtaining kernel information](chapter-2.md#262-obtaining-kernel-information)
+    - [2.6.3 Code example: obtaining kernel information](chapter-2.md#263-code-example-obtaining-kernel-information)
+- [2.7 Collecting kernels in a command queue](chapter-2.md#27-collecting-kernels-in-a-command-queue)
+    - [2.7.1 Creating command queues](chapter-2.md#271-creating-command-queues)
+    - [2.7.2 Enqueuing kernel execution commands](chapter-2.md#272-enqueuing-kernel-execution-commands)
+    - [2.7.3 Example code](chapter-2.md#273-example-code)
+- [2.8 Summary](chapter-2.md#28-summary)
 
-## Chapter 3: Host programming: data transfer and partitioning
-- 3.1 Setting kernel arguments
-- 3.2 Buffer objects
-    - 3.2.1 Allocating buffer objects
-    - 3.2.2 Creating subbuffer objects
-- 3.3 Image objects
-    - 3.3.1 Creating image objects
-    - 3.3.2 Obtaining information about image objects
-- 3.4 Obtaining information about buffer objects
-- 3.5 Memory object transfer commands
-    - 3.5.1 Read/write data transfer
-    - 3.5.2 Mapping memory objects
-    - 3.5.3 Copying data between memory objects
-- 3.6 Data partitioning
-    - 3.6.1 Loops and work-items
-    - 3.6.2 Work sizes and offsets
-    - 3.6.3 A simple one-dimensional example
-    - 3.6.4 Work-groups and compute units
-- 3.7 Summary
+## [Chapter 3: Host programming: data transfer and partitioning](chapter-3.md#chapter-3-host-programming--data-transfer-and-partitioning)
+- [3.1 Setting kernel arguments](chapter-3.md#31-setting-kernel-arguments)
+- [3.2 Buffer objects](chapter-3.md#32-buffer-objects)
+    - [3.2.1 Allocating buffer objects](chapter-3.md#321-allocating-buffer-objects)
+    - [3.2.2 Creating subbuffer objects](chapter-3.md#322-creating-subbuffer-objects)
+- [3.3 Image objects](chapter-3.md#33-image-objects)
+    - [3.3.1 Creating image objects](chapter-3.md#331-creating-image-objects)
+    - [3.3.2 Obtaining information about image objects](chapter-3.md#332-obtaining-information-about-image-objects)
+- [3.4 Obtaining information about buffer objects](chapter-3.md#34-obtaining-information-about-buffer-objects)
+- [3.5 Memory object transfer commands](chapter-3.md#35-memory-object-transfer-commands)
+    - [3.5.1 Read/write data transfer](chapter-3.md#351-readwrite-data-transfer)
+    - [3.5.2 Mapping memory objects](chapter-3.md#352-mapping-memory-objects)
+    - [3.5.3 Copying data between memory objects](chapter-3.md#353-copying-data-between-memory-objects)
+- [3.6 Data partitioning](chapter-3.md#36-data-partitioning)
+    - [3.6.1 Loops and work-items](chapter-3.md#361-loops-and-work-items)
+    - [3.6.2 Work sizes and offsets](chapter-3.md#362-work-sizes-and-offsets)
+    - [3.6.3 A simple one-dimensional example]chapter-3.md#363-a-simple-one-dimensional-example)
+    - [3.6.4 Work-groups and compute units](chapter-3.md#364-work-groups-and-compute-units)
+- [3.7 Summary](chapter-3.md#37-summary)
 
 ## Chapter 4: Kernel programming: data types and device memory
 - 4.1 Introducing kernel coding
