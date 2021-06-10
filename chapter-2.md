@@ -75,15 +75,10 @@ where:
 |`CL_PLATFORM_PROFILE`|Identifies whether the platform supports the full OpenCL standard (`FULL_PROFILE`) or the embedded standard (`EMBEDDED_PROFILE`)|
 |`CL_PLATFORM_EXTENSIONS`|Returns a list of extensions supported by the platform|
 
-<details>
-  <summary>The following code shows how this is accomplished!</summary>
-
 ```Cpp
 char pform_vendor[40];
 clGetPlatformInfo(platforms[0], CL_PLATFORM_VENDOR, sizeof(pform_vendor), &pform_vendor, NULL);
 ```
-
-</details>
 
 ### 2.2.3. Code example: testing platform extensions
 
@@ -289,17 +284,12 @@ Bản chất giống với hàm [`clGetDeviceInfo`](#obtaining_platform_informat
 |`CL_DEVICE_ADDRESS_BITS`|`cl_uint`|Returns the size of the device’s address space|
 |`CL_DEVICE_AVAILABLE`|`cl_bool`|Returns whether the device is available|
 |`CL_DEVICE_COMPILER_AVAILABLE`|`cl_bool`|Returns whether the implementation provides a compiler for the device|
-
-<details>
-  <summary>The following code shows how this is accomplished!</summary>
-
+	
 ```Cpp
 char pform_vendor[40];
 clGetPlatformInfo(platforms[0], CL_PLATFORM_VENDOR, sizeof(pform_vendor), &pform_vendor, NULL);
 ```
-
-</details>
-
+	
 ### 2.3.3. Code example: testing device extensions
 
 <details>
