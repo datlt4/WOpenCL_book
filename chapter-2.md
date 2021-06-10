@@ -253,9 +253,6 @@ where:
 |`CL_DEVICE_TYPE_GPU`|Identifies a device containing a graphics processor unit (GPU)|
 |`CL_DEVICE_TYPE_ACCELERATOR`|Identifies an external device used to accelerate computation|
 
-<details>
-  <summary>EXAMPLE CODE!</summary>
-
 ```Cpp
 cl_platform_id devs;
 clGetDeviceIDs(plat, CL_DEVICE_TYPE_GPU, 3, devs, NULL);
@@ -263,8 +260,6 @@ clGetDeviceIDs(plat, CL_DEVICE_TYPE_GPU, 3, devs, NULL);
 cl_uint num_devices;
 clGetDeviceIDs(plat, CL_DEVICE_TYPE_ACCELERATOR, 1, NULL, &num_devices);
 ```
-
-</details>
 
 ### 2.3.2. Obtaining device information
 
@@ -672,9 +667,6 @@ where:
 > `src_strings`: chuỗi source string.<br>
 > `src_sizes`: độ dài của từng chuỗi string.
 
-<details>
-  <summary>EXAMPLE CODE!</summary>
-
 ```cpp
 // Determine size of source file.
 program_handle = fopen("kernel.cl", "r");
@@ -692,7 +684,6 @@ fclose(program_handle);
 cl_program program;
 program = clCreateProgramWithSource(context, 1, (const char**)program_buffer, program_size, &err);
 ```
-</details>
 
 ### 2.5.2. Building programs
 
@@ -1295,7 +1286,7 @@ clReleaseCommandQueue(queue);
 ...
 ```
 
-### 2.7.3
+### 2.7.3 EXAMPLE CODE!
 
 
 <details>
