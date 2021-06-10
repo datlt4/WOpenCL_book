@@ -66,7 +66,7 @@ Reference:
 - [3.6 Data partitioning](chapter-3.md#36-data-partitioning)
     - [3.6.1 Loops and work-items](chapter-3.md#361-loops-and-work-items)
     - [3.6.2 Work sizes and offsets](chapter-3.md#362-work-sizes-and-offsets)
-    - [3.6.3 A simple one-dimensional example]chapter-3.md#363-a-simple-one-dimensional-example)
+    - [3.6.3 A simple one-dimensional example](chapter-3.md#363-a-simple-one-dimensional-example)
     - [3.6.4 Work-groups and compute units](chapter-3.md#364-work-groups-and-compute-units)
 - [3.7 Summary](chapter-3.md#37-summary)
 
