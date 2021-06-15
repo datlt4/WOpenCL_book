@@ -57,7 +57,7 @@ where:
 
 ### 3.2.1 Allocating buffer objects
 
-- Với ví dụ dưới đây, một `buffer object` tên là `vec_buff` được tạo as `read-only`. `Buffer` này sẽ gói data được tham chiếu bởi `vec` và data bản đầu được allocated ở `host`, nên `vec` được gọi là `host pointer`.
+- Với ví dụ dưới đây, một `buffer object` tên là `vec_buff` được tạo as `read-only`. `Buffer` này sẽ gói data được tham chiếu bởi `vec` và data ban đầu được allocated ở `host`, nên `vec` được gọi là `host pointer`.
 
 ```cpp
 vec_buff = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float)*32, vec, &error);
@@ -89,7 +89,7 @@ clSetKernelArg(kernel, 1, sizeof(cl_mem), &output_buffer);
 - Giống như ta có thể tạo ra một `substring` từ một `string`, thì ta có thể tạo ra một `subbuffer object` từ một `buffer object`.
 
 ```cpp
-clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags, cl_buffer_create_type type, const void *info, cl_int *error)
+clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags, cl_buffer_create_type type, const void *info, cl_int *error);
 ```
 where:
 > `flags`: giống như [bảng](#table_memory_object_properties).<br>
@@ -115,7 +115,7 @@ region.origin = 50*sizeof(float);
 sub_buffer = clCreateSubBuffer(main_buffer, CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &region, &err);
 ```
 
-- `subbuffer` không allocate vùng nhớ riêng của nó để giữ data. Thay vào đó, nó truy cập vào cùng cùng nhớ của `main buffer`. Không cần thêm cờ `CL_MEM_COPY_HOST_PTR`.
+- `subbuffer` không allocate vùng nhớ riêng của nó để giữ data. Thay vào đó, nó truy cập vào cùng vùng nhớ của `main buffer`. Không cần thêm cờ `CL_MEM_COPY_HOST_PTR`.
 
 ## 3.3 Image objects
 
@@ -131,8 +131,8 @@ sub_buffer = clCreateSubBuffer(main_buffer, CL_MEM_READ_ONLY, CL_BUFFER_CREATE_T
   - Cả 2 hàm đều trả về một `cl_mem`.
 
 ```cpp
-clCreateImage2D (cl_context context, cl_mem_flags opts, const cl_image_format *format, size_t width, size_t height, size_t row_pitch, void *data, cl_int *error)
-clCreateImage3D (cl_context context, cl_mem_flags opts, const cl_image_format *format, size_t width, size_t height, size_t depth, size_t row_pitch, size_t slice_pitch, void *data, cl_int *error)
+clCreateImage2D (cl_context context, cl_mem_flags opts, const cl_image_format *format, size_t width, size_t height, size_t row_pitch, void *data, cl_int *error);
+clCreateImage3D (cl_context context, cl_mem_flags opts, const cl_image_format *format, size_t width, size_t height, size_t depth, size_t row_pitch, size_t slice_pitch, void *data, cl_int *error);
 ```
 where:
 > `context`, `opts`: được sử dụng để tạo `buffer objects`.<br>
@@ -252,7 +252,7 @@ where:
 |`CL_MEM_REFERENCE_COUNT`|`cl_uint`|Returns the memory object’s reference count (the number of times the object has been accessed)|
 |`CL_MEM_D3D10_RESOURCE_KHR`|`ID3D10Resource*`|Returns a pointer to the OpenCL-Direct3D interface|
 
-- Hàm này đặt biệt hữu ích khi ta muốn kiểm tra kích thước và địa chỉ của `memory object's data`.
+- Hàm này đặc biệt hữu ích khi ta muốn kiểm tra kích thước và địa chỉ của `memory object's data`.
 
 <details>
   <summary>EXAMPLE CODE!</summary>
