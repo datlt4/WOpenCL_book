@@ -37,7 +37,7 @@ clSetKernelArg(proc, 1, sizeof(mem_obj), &mem_obj);
 clCreateBuffer(cl_context context, cl_mem_flags options, size_t size, void *host_ptr, cl_int *error)
 ```
 where:
-> `@return`: trả về một `cl_mem`, cái mà chứ data được trỏ bở `host_ptr *`
+> `@return`: trả về một `cl_mem`, cái mà chứa data được trỏ bởi `host_ptr *`
 
 <a name="table_memory_object_properties"></a>
 |`cl_mem_flags`|Meaning|
