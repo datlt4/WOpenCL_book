@@ -579,7 +579,7 @@ clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &work_items_per_kernel, NULL, 0, 
 
 - Điều này thông báo cho OpenCL rằng, dữ liệu được phân vùng thành từng `single dimension` và `4 work-items` cần được tạo để thực hiện trong kernel.
 
-- Bên phía `kernel`, từng `work-item` kiểm tra `global ID` và truy cập từng dòng của matrix. thực hiện nhân một hàng `1x4`) với một vector `4x1` sử dụng hàm `dot`.
+- Bên phía `kernel`, từng `work-item` kiểm tra `global ID` và truy cập từng dòng của matrix. thực hiện nhân một hàng `1x4` với một vector `4x1` sử dụng hàm `dot`.
 
 ```cpp
 int i = get_global_id(0);
