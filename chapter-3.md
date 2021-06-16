@@ -510,7 +510,7 @@ clean:
 
 ## 3.6 Data partitioning
 
-- Khi triển khai một thuật toán với `OpenCL`, ta có thể phải xử lý một lượng lớn data. Điều này khiển việc phân vùng trở nên ưu tiên - vì phân phối `processing load` các tốt thì `computational tasks` càng kết thúc nhanh.
+- Khi triển khai một thuật toán với `OpenCL`, ta có thể phải xử lý một lượng lớn data. Điều này khiến việc phân vùng trở nên ưu tiên - vì phân phối `processing load` các tốt thì `computational tasks` càng kết thúc nhanh.
 
 - Ta đã biết cách phân chia dữ liệu giữa nhiều thiết bị, nhưng ta còn có thể phân vùng dữ liệu của mình hơn nữa. Hầu hết các thiết bị OpenCL đều chứa một số `processing element` và với mã phù hợp, ta có thể kiểm soát lượng dữ liệu mà mỗi `processing element` nhận được.
 
@@ -522,8 +522,8 @@ clEnqueueNDRangeKernel(cl_command_queue queue, cl_kernel kernel, cl_uint work_di
 where:
 > `work_dims`: số chiều của dữ liệu.<br>
 > `global_work_offset`: `global ID offsets` trong từng chiều.<br>
-> `global_work_size`: số lương `work-items` trong từng chiều.<br>
-> `local_work_size`: số lương `work-items` trong `work-group` trong từng chiều.
+> `global_work_size`: số lượng `work-items` trong từng chiều.<br>
+> `local_work_size`: số lượng `work-items` trong `work-group` trong từng chiều.
 
 ### 3.6.1 Loops and work-items
 
@@ -542,11 +542,11 @@ for(i=0; i<Z; i++)
 }
 ```
 
-- Một khía cạnh hấp dẫn của OpenCL là ta không cần phải cấu hình những vòng lặp này ở trong kernel, thay vào đó `kernel` chỉ cần thực thi code nằm trong vòng lặp trong cùn. Ta gọi từng `individual kernel execution` này là một `work-item`. Đối với ví dụ trên, `work item` chỉ bao gồm một hàm: `process(point[i][j][k])`.
+- Một khía cạnh hấp dẫn của OpenCL là ta không cần phải cấu hình những vòng lặp này ở trong kernel, thay vào đó `kernel` chỉ cần thực thi code nằm trong vòng lặp trong cùng. Ta gọi từng `individual kernel execution` này là một `work-item`. Đối với ví dụ trên, `work item` chỉ bao gồm một hàm: `process(point[i][j][k])`.
 
 - Sự khác nhau giữa `kernel` và `work-item` là: `kernel` là một tập các `task` được thực thi trên dữ liệu. Còn `work-item` là một phép triển khai của một `kernel` trên một tập dữ liệu nhất định. Mỗi `kernel` có thể là nhiều `work-item`. Trong ví dụ trên `process(point[i][j][k])` là một `kernel`, còn `process(point[1][2][3])` là một `work-item`.
 
-- Mảng `{i, j k}` được gọi là `global ID` của `work-item`. Nó xác định `work-item` duy nhất cho phép truy cập dữ liệu phải xử lý. Sau khi một `work-item` thực thi xong, một `work-item` mới sẽ được thực thi với `global ID` khác.
+- Mảng `{i, j, k}` được gọi là `global ID` của `work-item`. Nó xác định `work-item` duy nhất cho phép truy cập dữ liệu phải xử lý. Sau khi một `work-item` thực thi xong, một `work-item` mới sẽ được thực thi với `global ID` khác.
 
 - Số  phần tử của `global ID` tương ứng với số chiều của dữ liệu - tham số truyền vào `work_dims` của `clEnqueueNDRangeKernel`. Số chiều bé là `1` và lớn nhất phụ thuộc vào thiết bị. Có thể truy vấn bằng cách gọi hàm `clGetDeviceInfo` với tham số `CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS`
 
@@ -574,7 +574,7 @@ process(point[i][j][k]);
 
 ```cpp
 work_items_per_kernel = 4;
-clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &workitemsperkernel, NULL, 0, NULL, NULL);
+clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &work_items_per_kernel, NULL, 0, NULL, NULL);
 ```
 
 - Điều này thông báo cho OpenCL rằng, dữ liệu được phân vùng thành từng `single dimension` và `4 work-items` cần được tạo để thực hiện trong kernel.
