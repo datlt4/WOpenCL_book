@@ -37,7 +37,7 @@ clSetKernelArg(proc, 1, sizeof(mem_obj), &mem_obj);
 clCreateBuffer(cl_context context, cl_mem_flags options, size_t size, void *host_ptr, cl_int *error)
 ```
 where:
-> `@return`: trả về một `cl_mem`, cái mà chứ data được trỏ bở `host_ptr *`
+> `@return`: trả về một `cl_mem`, cái mà chứa data được trỏ bởi `host_ptr *`
 
 <a name="table_memory_object_properties"></a>
 |`cl_mem_flags`|Meaning|
@@ -57,7 +57,7 @@ where:
 
 ### 3.2.1 Allocating buffer objects
 
-- Với ví dụ dưới đây, một `buffer object` tên là `vec_buff` được tạo as `read-only`. `Buffer` này sẽ gói data được tham chiếu bởi `vec` và data bản đầu được allocated ở `host`, nên `vec` được gọi là `host pointer`.
+- Với ví dụ dưới đây, một `buffer object` tên là `vec_buff` được tạo as `read-only`. `Buffer` này sẽ gói data được tham chiếu bởi `vec` và data ban đầu được allocated ở `host`, nên `vec` được gọi là `host pointer`.
 
 ```cpp
 vec_buff = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float)*32, vec, &error);
@@ -89,7 +89,7 @@ clSetKernelArg(kernel, 1, sizeof(cl_mem), &output_buffer);
 - Giống như ta có thể tạo ra một `substring` từ một `string`, thì ta có thể tạo ra một `subbuffer object` từ một `buffer object`.
 
 ```cpp
-clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags, cl_buffer_create_type type, const void *info, cl_int *error)
+clCreateSubBuffer(cl_mem buffer, cl_mem_flags flags, cl_buffer_create_type type, const void *info, cl_int *error);
 ```
 where:
 > `flags`: giống như [bảng](#table_memory_object_properties).<br>
@@ -115,7 +115,7 @@ region.origin = 50*sizeof(float);
 sub_buffer = clCreateSubBuffer(main_buffer, CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &region, &err);
 ```
 
-- `subbuffer` không allocate vùng nhớ riêng của nó để giữ data. Thay vào đó, nó truy cập vào cùng cùng nhớ của `main buffer`. Không cần thêm cờ `CL_MEM_COPY_HOST_PTR`.
+- `subbuffer` không allocate vùng nhớ riêng của nó để giữ data. Thay vào đó, nó truy cập vào cùng vùng nhớ của `main buffer`. Không cần thêm cờ `CL_MEM_COPY_HOST_PTR`.
 
 ## 3.3 Image objects
 
@@ -131,8 +131,8 @@ sub_buffer = clCreateSubBuffer(main_buffer, CL_MEM_READ_ONLY, CL_BUFFER_CREATE_T
   - Cả 2 hàm đều trả về một `cl_mem`.
 
 ```cpp
-clCreateImage2D (cl_context context, cl_mem_flags opts, const cl_image_format *format, size_t width, size_t height, size_t row_pitch, void *data, cl_int *error)
-clCreateImage3D (cl_context context, cl_mem_flags opts, const cl_image_format *format, size_t width, size_t height, size_t depth, size_t row_pitch, size_t slice_pitch, void *data, cl_int *error)
+clCreateImage2D (cl_context context, cl_mem_flags opts, const cl_image_format *format, size_t width, size_t height, size_t row_pitch, void *data, cl_int *error);
+clCreateImage3D (cl_context context, cl_mem_flags opts, const cl_image_format *format, size_t width, size_t height, size_t depth, size_t row_pitch, size_t slice_pitch, void *data, cl_int *error);
 ```
 where:
 > `context`, `opts`: được sử dụng để tạo `buffer objects`.<br>
@@ -252,7 +252,7 @@ where:
 |`CL_MEM_REFERENCE_COUNT`|`cl_uint`|Returns the memory object’s reference count (the number of times the object has been accessed)|
 |`CL_MEM_D3D10_RESOURCE_KHR`|`ID3D10Resource*`|Returns a pointer to the OpenCL-Direct3D interface|
 
-- Hàm này đặt biệt hữu ích khi ta muốn kiểm tra kích thước và địa chỉ của `memory object's data`.
+- Hàm này đặc biệt hữu ích khi ta muốn kiểm tra kích thước và địa chỉ của `memory object's data`.
 
 <details>
   <summary>EXAMPLE CODE!</summary>
@@ -514,7 +514,7 @@ clean:
 
 ## 3.6 Data partitioning
 
-- Khi triển khai một thuật toán với `OpenCL`, ta có thể phải xử lý một lượng lớn data. Điều này khiển việc phân vùng trở nên ưu tiên - vì phân phối `processing load` các tốt thì `computational tasks` càng kết thúc nhanh.
+- Khi triển khai một thuật toán với `OpenCL`, ta có thể phải xử lý một lượng lớn data. Điều này khiến việc phân vùng trở nên ưu tiên - vì phân phối `processing load` các tốt thì `computational tasks` càng kết thúc nhanh.
 
 - Ta đã biết cách phân chia dữ liệu giữa nhiều thiết bị, nhưng ta còn có thể phân vùng dữ liệu của mình hơn nữa. Hầu hết các thiết bị OpenCL đều chứa một số `processing element` và với mã phù hợp, ta có thể kiểm soát lượng dữ liệu mà mỗi `processing element` nhận được.
 
@@ -526,8 +526,8 @@ clEnqueueNDRangeKernel(cl_command_queue queue, cl_kernel kernel, cl_uint work_di
 where:
 > `work_dims`: số chiều của dữ liệu.<br>
 > `global_work_offset`: `global ID offsets` trong từng chiều.<br>
-> `global_work_size`: số lương `work-items` trong từng chiều.<br>
-> `local_work_size`: số lương `work-items` trong `work-group` trong từng chiều.
+> `global_work_size`: số lượng `work-items` trong từng chiều.<br>
+> `local_work_size`: số lượng `work-items` trong `work-group` trong từng chiều.
 
 ### 3.6.1 Loops and work-items
 
@@ -546,11 +546,11 @@ for(i=0; i<Z; i++)
 }
 ```
 
-- Một khía cạnh hấp dẫn của OpenCL là ta không cần phải cấu hình những vòng lặp này ở trong kernel, thay vào đó `kernel` chỉ cần thực thi code nằm trong vòng lặp trong cùn. Ta gọi từng `individual kernel execution` này là một `work-item`. Đối với ví dụ trên, `work item` chỉ bao gồm một hàm: `process(point[i][j][k])`.
+- Một khía cạnh hấp dẫn của OpenCL là ta không cần phải cấu hình những vòng lặp này ở trong kernel, thay vào đó `kernel` chỉ cần thực thi code nằm trong vòng lặp trong cùng. Ta gọi từng `individual kernel execution` này là một `work-item`. Đối với ví dụ trên, `work item` chỉ bao gồm một hàm: `process(point[i][j][k])`.
 
 - Sự khác nhau giữa `kernel` và `work-item` là: `kernel` là một tập các `task` được thực thi trên dữ liệu. Còn `work-item` là một phép triển khai của một `kernel` trên một tập dữ liệu nhất định. Mỗi `kernel` có thể là nhiều `work-item`. Trong ví dụ trên `process(point[i][j][k])` là một `kernel`, còn `process(point[1][2][3])` là một `work-item`.
 
-- Mảng `{i, j k}` được gọi là `global ID` của `work-item`. Nó xác định `work-item` duy nhất cho phép truy cập dữ liệu phải xử lý. Sau khi một `work-item` thực thi xong, một `work-item` mới sẽ được thực thi với `global ID` khác.
+- Mảng `{i, j, k}` được gọi là `global ID` của `work-item`. Nó xác định `work-item` duy nhất cho phép truy cập dữ liệu phải xử lý. Sau khi một `work-item` thực thi xong, một `work-item` mới sẽ được thực thi với `global ID` khác.
 
 - Số  phần tử của `global ID` tương ứng với số chiều của dữ liệu - tham số truyền vào `work_dims` của `clEnqueueNDRangeKernel`. Số chiều bé là `1` và lớn nhất phụ thuộc vào thiết bị. Có thể truy vấn bằng cách gọi hàm `clGetDeviceInfo` với tham số `CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS`
 
@@ -578,12 +578,12 @@ process(point[i][j][k]);
 
 ```cpp
 work_items_per_kernel = 4;
-clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &workitemsperkernel, NULL, 0, NULL, NULL);
+clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &work_items_per_kernel, NULL, 0, NULL, NULL);
 ```
 
 - Điều này thông báo cho OpenCL rằng, dữ liệu được phân vùng thành từng `single dimension` và `4 work-items` cần được tạo để thực hiện trong kernel.
 
-- Bên phía `kernel`, từng `work-item` kiểm tra `global ID` và truy cập từng dòng của matrix. thực hiện nhân một hàng `1x4`) với một vector `4x1` sử dụng hàm `dot`.
+- Bên phía `kernel`, từng `work-item` kiểm tra `global ID` và truy cập từng dòng của matrix. thực hiện nhân một hàng `1x4` với một vector `4x1` sử dụng hàm `dot`.
 
 ```cpp
 int i = get_global_id(0);
