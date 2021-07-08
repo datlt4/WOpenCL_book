@@ -271,12 +271,63 @@ ushort8 shorts = (ushort8)(0, 10, 20, 30, 40, 50, 60, 70);
 
 1. `THE __GLOBAL QUALIFIER`
 
+```c++
+__kernel void kernel_func(__global float *f)
+{
+    __global uint *x = 5;
+    f = (global float*)x;
+}
+```
+
+- `f` và `x` có thể cast vì đều tham chiếu tới `global memory`.
+
 2. `THE __CONSTANT QUALIFIER`
 
+- `constant data` is `global` to the entire program, not just a single `kernel`.
+
+- It must be initialized before use.
+
+3. `THE __LOCAL QUALIFIER`
+
+- If data needs to be shared among `work-items` in a `work-group`, but not shared with other `work-groups`, it should be declared with the `__local` qualifier.
+
+- This data will be allocated once for each `work-group` processing the `kernel`.
+
+- It’s deallocated as each `work-group` completes its processing.
+
+4. `THE __PRIVATE QUALIFIER`
+
+- If a kernel argument or variable doesn’t have an address space qualifier, it’s stored in `private memory`.
+
+- This includes all variables and arguments of non-kernel functions.
+
+- Private data is allocated for each work-item processing a kernel.
+
+- If a `pointer variable` doesn’t have a qualifier, it will be set to reference `private memory`. But `image2d_t` and `image3d_t` `pointers` are always `global`.
 
 ### 4.5.4 Memory alignment
 
+- Khi lưu dữ liệu trong 1 vùng nhớ, ta có thể thấy dữ liệu cấu trúc `32-bit` (`int`, `float`) thường được lưu dưới bội của `0x4` như `0xFFF0`, `0xFFF4`, `0xFFF8`, `0xFFFC`. Tương tự vậy: dữ liệu cấu trúc `64-bit` thường được lưu dưới bội của `0x8`.
+
+- when a data structure is stored, its `memory alignment` is set to the smallest power of two that’s greater than or equal to the data’s size. For example, a `float3` contains `12 bytes`. This vector will be stored on a `16-byte` boundary because `16` is the smallest power of `2` greater than or equal to `12`.
+
+- You can control data alignment with the `aligned` attribute, which can only be used when the data is declared. The aligned keyword must be preceded by `__attribute__`,
+
+```c++
+short x __attribute__ ((aligned(4)));
+```
+
+- Hàm này nói rằng, biến `x` bình thường được aligned với `2-byte boundary`, và bây giờ sẽ được aligned trên `4-byte boundary`.
+
 ## 4.6 Local and private kernel arguments
+
+- Mỗi kernel argument thường được khai báo là `__global` và được truyền từ `host` dưới dạng `memory object`.
+
+- Ta có thể cấu hình các `arguments` trong `local space` hoặc `private space`.
+
+```c++
+clSetKernelArg (cl_kernel kernel, cl_uint index, size_t size, const void *value)
+```
 
 ### 4.6.1 Local arguments
 
