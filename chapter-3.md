@@ -461,13 +461,17 @@ clean:
 
 - Các hàm `clEnqueueReadImage` và `clEnqueueWriteImage` có thêm 2 tham số là `orgin[3]` và `region[3]`. Hai mảng này xác định vùng hình chữ nhật của `image data` được truyền vào hoặc truyền ra `image object`. Trong đó: `origin[3] = [column, row, slice]` xác định vị trí của tọa độ điểm pixel đầu tiên, `region[3] = [width, height, depth]` xác định kích thước của vùng truy cập. (Đối với ảnh `2-d`: `origin = [column, row, 0]` và `region = [width, height, 0]`)
 
-[<img src= "images/F3_4.png" width="522">]()
+<p align="center">
+  <img src= "images/F3_4.png" width="522"/>
+</p>
 
 - Hai hàm cuối cùng: `clEnqueueReadBufferRect` và `clEnqueueWriteBufferRect` giúp chuyển dữ liệu vào ra `buffer objects`, nhưng chúng truy cập dữ liệu theo `rectangular regions` tương tự chuyển `image data`. Bên cạnh `region[3]`, `buffer_origin[3]` xác định điểm bắt đầu của `buffer object data` và `host_origin[3]` là điểm bắt đầu của dữ liệu trong `host memory`. Ngoài ra, ta còn phải xác định `row pitch` và `slide pitch` cho cả `host objects` và `buffer objects`, nhưng các tham số này có thể đặt bằng `0`.
 
 - `clEnqueueReadBufferRect` và `clEnqueueWriteBufferRect` thích hợp để chuyển dữ liệu nhiều chiều nhưng không liên quan tới ảnh. _Ví dụ: giả sử ta lưu một ma trận trong một `buffer object`, và ta muốn đọc một ma trận con vào `host memory`, khi đó `clEnqueueReadBufferRect` được sử dụng_.
 
-[<img src= "images/F3_5.png" width="522">]()
+<p align="center">
+  <img src= "images/F3_5.png" width="522"/>
+</p>
 
 ### 3.5.2 Mapping memory objects
 
