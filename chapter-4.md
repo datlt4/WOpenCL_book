@@ -30,14 +30,14 @@ __kernel void hello_kernel(__global char16 *msg)
 |`Scalar data type`|Purpose|
 |---|---|
 |`bool`|A Boolean condition: `true` `1` or `false` `0`|
-|`char`|Signed two’s complement 8-bit integer|
-|`unsigned char` `uchar`|Unsigned two’s complement 8-bit integer|
-|`short`|Signed two’s complement 16-bit integer|
-|`unsigned short` `ushort`|Unsigned two’s complement 16-bit integer|
-|`int`|Signed two’s complement 32-bit integer|
-|`unsigned int` `uint`|Unsigned two’s complement 32-bit integer|
-|`long`|Signed two’s complement 64-bit integer|
-|`unsigned long` `ulong`|Unsigned two’s complement 64-bit integer|
+|`char`|Signed two's complement 8-bit integer|
+|`unsigned char` `uchar`|Unsigned two's complement 8-bit integer|
+|`short`|Signed two's complement 16-bit integer|
+|`unsigned short` `ushort`|Unsigned two's complement 16-bit integer|
+|`int`|Signed two's complement 32-bit integer|
+|`unsigned int` `uint`|Unsigned two's complement 32-bit integer|
+|`long`|Signed two's complement 64-bit integer|
+|`unsigned long` `ulong`|Unsigned two's complement 64-bit integer|
 |`half`|16-bit floating-point value, IEEE-754-2008 conformant|
 |`float`|32-bit floating-point value, IEEE-754 conformant|
 |`intptr_t`|Signed integer to which a void pointer can be converted|
@@ -85,15 +85,15 @@ __kernel void hello_kernel(__global char16 *msg)
 
 |Vector data type|Purpose|
 |:---:|---|
-|`charn`|Vector containing n 8-bit signed two’s complement integers|
-|`ucharn`|Vector containing n 8-bit unsigned two’s complement integers|
-|`shortn`|Vector containing n 16-bit signed two’s complement integers|
-|`ushortn`|Vector containing n 16-bit unsigned two’s complement integers|
-|`intn`|Vector containing n 32-bit signed two’s complement integers|
-|`uintn`|Vector containing n 32-bit unsigned two’s complement integers|
-|`longn`|Vector containing n 64-bit signed two’s complement integers|
+|`charn`|Vector containing n 8-bit signed two's complement integers|
+|`ucharn`|Vector containing n 8-bit unsigned two's complement integers|
+|`shortn`|Vector containing n 16-bit signed two's complement integers|
+|`ushortn`|Vector containing n 16-bit unsigned two's complement integers|
+|`intn`|Vector containing n 32-bit signed two's complement integers|
+|`uintn`|Vector containing n 32-bit unsigned two's complement integers|
+|`longn`|Vector containing n 64-bit signed two's complement integers|
 |`floatn`|Vector containing n 32-bit single-precision floating-point values|
-|`ulongn`|Vector containing n 64-bit unsigned two’s complement integers|
+|`ulongn`|Vector containing n 64-bit unsigned two's complement integers|
 
 `n` represents a number, and OpenCL accepts `2`, `3`, `4`, `8`, and `16` as valid
 values of n.
@@ -262,10 +262,10 @@ ushort8 shorts = (ushort8)(0, 10, 20, 30, 40, 50, 60, 70);
 
 - Mỗi `kernel argument` phải có một `qualifier`. Tương ứng có 4 `qualifier`:
 
-  - `__global` - The argument’s data will be placed in global memory
-  - `__constant` - The argument’s data will be stored in global, read-only memory (if available)
-  - `__local` - The argument’s data will be stored in local memory
-  - `__private` - The argument’s data will be stored in private memory (default)
+  - `__global` - The argument's data will be placed in global memory
+  - `__constant` - The argument's data will be stored in global, read-only memory (if available)
+  - `__local` - The argument's data will be stored in local memory
+  - `__private` - The argument's data will be stored in private memory (default)
 
 - Việc hiểu rõ về `qualifiers` không chỉ vì tốc độ truy cập vùng nhớ. Nếu ta không sử dụng chúng hợp lý, code sẽ không thể biên dịch được. Ví dụ, nếu hai pointer tham chiếu 2 `memory spaces` khác nhau, ta không thể thực hiện lệnh `cast`.
 
@@ -293,23 +293,23 @@ __kernel void kernel_func(__global float *f)
 
 - This data will be allocated once for each `work-group` processing the `kernel`.
 
-- It’s deallocated as each `work-group` completes its processing.
+- It's deallocated as each `work-group` completes its processing.
 
 4. `THE __PRIVATE QUALIFIER`
 
-- If a kernel argument or variable doesn’t have an address space qualifier, it’s stored in `private memory`.
+- If a kernel argument or variable doesn't have an address space qualifier, it's stored in `private memory`.
 
 - This includes all variables and arguments of non-kernel functions.
 
 - Private data is allocated for each work-item processing a kernel.
 
-- If a `pointer variable` doesn’t have a qualifier, it will be set to reference `private memory`. But `image2d_t` and `image3d_t` `pointers` are always `global`.
+- If a `pointer variable` doesn't have a qualifier, it will be set to reference `private memory`. But `image2d_t` and `image3d_t` `pointers` are always `global`.
 
 ### 4.5.4 Memory alignment
 
 - Khi lưu dữ liệu trong 1 vùng nhớ, ta có thể thấy dữ liệu cấu trúc `32-bit` (`int`, `float`) thường được lưu dưới bội của `0x4` như `0xFFF0`, `0xFFF4`, `0xFFF8`, `0xFFFC`. Tương tự vậy: dữ liệu cấu trúc `64-bit` thường được lưu dưới bội của `0x8`.
 
-- when a data structure is stored, its `memory alignment` is set to the smallest power of two that’s greater than or equal to the data’s size. For example, a `float3` contains `12 bytes`. This vector will be stored on a `16-byte` boundary because `16` is the smallest power of `2` greater than or equal to `12`.
+- when a data structure is stored, its `memory alignment` is set to the smallest power of two that's greater than or equal to the data's size. For example, a `float3` contains `12 bytes`. This vector will be stored on a `16-byte` boundary because `16` is the smallest power of `2` greater than or equal to `12`.
 
 - You can control data alignment with the `aligned` attribute, which can only be used when the data is declared. The aligned keyword must be preceded by `__attribute__`,
 
@@ -331,6 +331,67 @@ clSetKernelArg (cl_kernel kernel, cl_uint index, size_t size, const void *value)
 
 ### 4.6.1 Local arguments
 
+- Khi truyền một hàm vào `kernel` bằng một `memory object`, ta không thể dặt `kernel argument specifier` là `__local`. `Host` không thể trực tiếp truy cập vào `device's local memory`.
+
+- `Host` có thể yêu cầu `device` allocate `local memroy` cho một `kernel argument`. Ví dụ khi thực hiện `clSetKernelArg` với value là `NULL`, `host` sẽ cấu hình một `local argument` có không giam nhớ chiếm `16 float`.
+
+```c++
+// host.cpp
+clSetKernelArg(kernel, 0, 16*sizeof(float), NULL);
+
+//kernel.cl
+__kernel void proc_data(__local float* nums, ...)
+{
+    ...
+}
+```
+
 ### 4.6.2 Private arguments
 
+- Không giống như `local memory`, `private memory` có thể được khởi tạo bởi `host`. Để cấu hình tham số nằm trong `private memory`, cần đặt tham số cuối của hàm `clSetKernelArg` là con trỏ của kiểu `primitive data`: `int*`, `float*`, `char*`.
+
+- `global/constant data` được truyền vào kernel `by reference`. `private data` được truyền vào kernel `by value`.
+
+```c++
+// host.cpp
+int num_iterations = 4;
+clSetKernelArg(kernel, 0, sizeof(numiterations), &numiterations);
+
+// kernel.cl
+__kernel void proc_data(int num_iters, ...)
+{
+    ...
+}
+```
+
+- Ngoài khi truyền tham só vào `private memory` ta truyền vào `primitive data`. Ta có thể truyền `argument` dưới dạng `vector`.
+
+```c++
+// host.cpp
+float nums[4] = {0.0f, 1.0f, 2.0f, 3.0f};
+clSetKernelArg(kernel, 0, sizeof(nums), nums);
+
+// kernel.cl
+__kernel void proc_data(float4 values, ...)
+{
+    ...
+}
+```
+
 ## 4.7 Summary
+
+- Programming an OpenCL kernel is a lot like programming a regular C function, but there are a few important differences. First, each kernel must be identified with `__kernel` and the function must return void. Second, OpenCL doesn't support all of the old data types, but it does provide new ones. Finally, OpenCL models devices in such a way that you can constrain which address space is used to store kernel data.
+
+- OpenCL's scalar data types present only a couple of complications. You can still code with `chars`, `shorts`, `ints`, `floats`, and `longs`, but you can only declare `doubles` and `halfs` if they're supported on the device. When it comes to floating-point processing, OpenCL supports many aspects of the `IEEE-754` standard, but not all of them. If you intend to port code to OpenCL, you should know which capabilities are available and which aren't.
+  
+- Of all the vector data types I've dealt with, OpenCL's vectors are the simplest to work with. The data type that holds four floats is simply called `float4`. Initializing a vector's content is like initializing an array, and accessing the components of a vector is easy—you can use numbers (`.s0`, `.s1`, `.s2`, ... `.sF`), letters (`x`, `y`, `z`, and `w`), and suffixes that return half of the vector's components (`.hi`, `.lo`, `.even`, and `.odd`).
+
+- OpenCL's memory model may seem frightening at first glance, but once you
+understand the operation of `work-groups` and `work-items`, you'll see why the different address spaces are necessary. The `global address space` stores data for the entire `device`, the `constant address space` stores `read-only` data, the `local address space stores` data for a specific `work-group`, and the `private address space` stores data for a specific `work-item`. OpenCL provides `qualifiers` that allow you to specify which address space a variable or function argument should be stored in.
+  
+- The last part of this chapter discussed the different ways you can configure kernel arguments in OpenCL. If you invoke `clSetKernelArg` with a `pointer` to a `memory object`, then the corresponding kernel argument must be a `pointer` declared as `__global` or `__constant`. If you invoke clSetKernelArg with `NULL`, the corresponding kernel argument must be a `pointer` declared as `__local`. If you invoke `clSetKernelArg` with a `pointer` to `primitive data`, the kernel argument won't be a pointer and it won't have any
+address space specifier.
+
+- This chapter has covered OpenCL data in detail, but there's been no discussion of all the different ways you can operate on this data. The next chapter will discuss OpenCL's operators and functions in detail, and we'll put these vector types to work.
+
+_cited: [OpenCL in Action How to Accelerate Graphics and Computations](https://www.manning.com/books/opencl-in-action) - Chapter 4: Kernel programming: data types and device memory._
