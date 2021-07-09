@@ -618,4 +618,4 @@ result[i] = dot(matrix[i], vector[0]);
 
 - _This chapter, in conjunction with chapter 2, has explained almost everything you need to know about host applications. The only topics that remain to be covered are synchronization, event-processing, and threads, which will be discussed in chapter 7. In the next chapter, we’ll depart from host programming and launch our discussion of kernel development_
 
-_cited: [OpenCL in Action How to Accelerate Graphics and Computations](https://www.manning.com/books/opencl-in-action) - Chapter 2 Host programming: fundamental data structures._
+_cited: [OpenCL in Action How to Accelerate Graphics and Computations](https://www.manning.com/books/opencl-in-action) - Chapter 3: Host programming: data transfer and partitioning._
