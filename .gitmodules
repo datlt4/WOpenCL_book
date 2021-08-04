@@ -1,0 +1,3 @@
+[submodule "Exercises-Solutions"]
+	path = Exercises-Solutions
+	url = https://github.com/HandsOnOpenCL/Exercises-Solutions
