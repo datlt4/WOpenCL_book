@@ -1,3 +1,6 @@
 [submodule "Exercises-Solutions"]
 	path = Exercises-Solutions
 	url = https://github.com/HandsOnOpenCL/Exercises-Solutions
+[submodule "GPUImageProcessingArticle"]
+	path = GPUImageProcessingArticle
+	url = https://github.com/githubharald/GPUImageProcessingArticle.git
