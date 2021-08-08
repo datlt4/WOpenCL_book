@@ -39,12 +39,43 @@ int main()
                 os << "\t\t. CL_DEVICE_VERSION                       : " << device.getInfo<CL_DEVICE_VERSION>() << std::endl;
                 os << "\t\t. CL_DEVICE_EXTENSIONS                    : " << device.getInfo<CL_DEVICE_EXTENSIONS>() << std::endl;
                 os << "\t\t. CL_DEVICE_PLATFORM                      : " << device.getInfo<CL_DEVICE_PLATFORM>() << std::endl;
-                os << "\t\t. CL_DEVICE_TYPE                          : " << device.getInfo<CL_DEVICE_TYPE>() << std::endl;
+                std::string deviceType;
+                switch (device.getInfo<CL_DEVICE_TYPE>())
+                {
+                case 1 << 0:
+                    deviceType = std::string("CL_DEFAULT");
+                    break;
+                case 1 << 1:
+                    deviceType = std::string("CL_CPU");
+                    break;
+                case 1 << 2:
+                    deviceType = std::string("CL_GPU");
+                    break;
+                case 1 << 3:
+                    deviceType = std::string("CL_ACCELERATOR");
+                    break;
+                default:
+                    break;
+                }
+                os << "\t\t. CL_DEVICE_TYPE                          : " << deviceType << std::endl;
                 os << "\t\t. CL_DEVICE_VENDOR_ID                     : " << device.getInfo<CL_DEVICE_VENDOR_ID>() << std::endl;
                 os << "\t\t. CL_DEVICE_MAX_COMPUTE_UNITS             : " << device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>() << std::endl;
                 os << "\t\t. CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS      : " << device.getInfo<CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS>() << std::endl;
                 os << "\t\t. CL_DEVICE_MAX_WORK_GROUP_SIZE           : " << device.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>() << std::endl;
+                std::vector<std::size_t> maxWorkItems = device.getInfo<CL_DEVICE_MAX_WORK_ITEM_SIZES>();
                 // os << "\t\t. CL_DEVICE_MAX_WORK_ITEM_SIZES           : " << device.getInfo<CL_DEVICE_MAX_WORK_ITEM_SIZES>() << std::endl;
+                for (int i = 0; i < maxWorkItems.size(); i++)
+                {
+                    if (i == 0)
+                    {
+                        os << "\t\t. CL_DEVICE_MAX_WORK_ITEM_SIZES           : " << maxWorkItems[i];
+                    }
+                    else
+                    {
+                        os << "x" << maxWorkItems[i];
+                    }
+                }
+                os << std::endl;
                 os << "\t\t. CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR   : " << device.getInfo<CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR>() << std::endl;
                 os << "\t\t. CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT  : " << device.getInfo<CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT>() << std::endl;
                 os << "\t\t. CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT    : " << device.getInfo<CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT>() << std::endl;
@@ -91,7 +122,8 @@ int main()
     {
         os << e.what() << ": Error code " << e.err() << std::endl;
     }
-
-    std::cout << os.str() << std::endl;
+    std::ofstream outFile("OpenCL_info.txt");
+    outFile << os.str() << std::endl;
+    outFile.close();
     return 0;
 }
