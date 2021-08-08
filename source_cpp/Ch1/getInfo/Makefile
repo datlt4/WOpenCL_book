@@ -1,28 +1,15 @@
-SRCS= getInfo.h
-OBJS=getInfo.o
-EXEC=getInfo
+PROJ=getInfo
+CXX = g++
+CXXFLAGS=-std=c++11
+INC_DIRS=-I /usr/local/cuda/include
+LIB_DIRS=-L /usr/local/cuda/lib64/libOpenCL.so
 
-GCC ?= g++
-CCFLAGS := -std=c++11
+LIBS=-lOpenCL
 
-LDFLAGS += -ggdb3 -O2 -Wall -Wextra -pedantic -lOpenCL
+$(PROJ): $(PROJ).cpp
+	$(CXX) $^ -o $@ $(CXXFLAGS) $(LIBS) $(INC_DIRS) $(LIB_DIRS)
 
-RM=rm -f
-
-# Target rules
-all: build
-
-build: ${EXEC}
-
-%.o: %.cpp %.h
-	$(GCC) $(CCFLAGS) $(INCLUDES) -o $@ -c $<
-
-${EXEC}: ${OBJS}
-	$(GCC) $(CCFLAGS) -o $@ $^ $(LDFLAGS)
+.PHONY: clean
 
 clean:
-	${RM} ${EXEC} *.o 
-
-dist-clean:
-	$(RM) $(EXEC)
-
+	rm -f $(PROJ)
