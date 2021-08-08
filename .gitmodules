@@ -4,3 +4,6 @@
 [submodule "GPUImageProcessingArticle"]
 	path = GPUImageProcessingArticle
 	url = https://github.com/githubharald/GPUImageProcessingArticle.git
+[submodule "opencl_examples_with_CMake"]
+	path = opencl_examples_with_CMake
+	url = https://github.com/mantiuk/opencl_examples.git
