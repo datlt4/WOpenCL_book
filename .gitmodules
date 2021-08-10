@@ -7,3 +7,6 @@
 [submodule "opencl_examples_with_CMake"]
 	path = opencl_examples_with_CMake
 	url = https://github.com/mantiuk/opencl_examples.git
+[submodule "OpenCL-101"]
+	path = OpenCL-101
+	url = https://github.com/ysh329/OpenCL-101
