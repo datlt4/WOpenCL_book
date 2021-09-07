@@ -15,6 +15,30 @@
 /usr/local/cuda/lib64/libOpenCL.so.1.0 -> libOpenCL.so.1.0.0*
 /usr/local/cuda/lib64/libOpenCL.so.1.0.0*
 ```
+
+<details>
+  <summary>Makefile</summary>
+
+```Makefile
+PROJ=getInfo
+CXX = g++
+CXXFLAGS=-std=c++11
+INC_DIRS=-I /usr/local/cuda/include
+LIB_DIRS=-L /usr/local/cuda/lib64/libOpenCL.so
+
+LIBS=-lOpenCL
+
+$(PROJ): $(PROJ).cpp
+	$(CXX) $^ -o $@ $(CXXFLAGS) $(LIBS) $(INC_DIRS) $(LIB_DIRS)
+
+.PHONY: clean
+
+clean:
+	rm -f $(PROJ) OpenCL_info.txt
+```
+
+</details>
+
 2. Install OpenCL for Intel onboard GPU
 
 ```bash
@@ -40,7 +64,9 @@ sudo apt install ocl-icd-opencl-dev
 - Once extracted move the `CL/` directory into `/usr/include`:
 
 ```bash
-sudo mv ~/Downloads/CL /usr/include
+git clone https://github.com/KhronosGroup/OpenCL-Headers.git
+sudo mv OpenCL-Headers/CL /usr/include
+sudo wget https://www.khronos.org/registry/OpenCL/api/2.1/cl.hpp -P /usr/include/CL
 ```
 
 - Now if you go into `/usr/lib/aarch64-linux-gnu` you can find the OpenCL library as `libOpenCL.so.1`. We need to add a symbolic link from `libOpenCL.so.1` to `libOpenCL.so`:
@@ -48,6 +74,27 @@ sudo mv ~/Downloads/CL /usr/include
 ```bash
 cd /usr/lib/aarch64-linux-gnu
 sudo ln -s libOpenCL.so.1 libOpenCL.so
+```
+
+<details>
+  <summary>Makefile</summary>
+
+```Makefile
+PROJ=getInfo
+CXX = g++
+CXXFLAGS=-std=c++11
+INC_DIRS=-I /usr/include
+LIB_DIRS=-L /usr/lib/aarch64-linux-gnu/libOpenCL.so
+
+LIBS=-lOpenCL
+
+$(PROJ): $(PROJ).cpp
+	$(CXX) $^ -o $@ $(CXXFLAGS) $(LIBS) $(INC_DIRS) $(LIB_DIRS)
+
+.PHONY: clean
+
+clean:
+	rm -f $(PROJ) OpenCL_info.txt
 ```
 
 # Reference:
