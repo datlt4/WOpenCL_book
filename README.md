@@ -1,6 +1,56 @@
 # WOpenCL_book
 
-Reference:
+# Install OpenCL
+
+## On Ubuntu
+
+1. Install nvidia-driver, 
+
+- After install nvidia-driver, header files located at `/usr/local/cuda/include/CL`, and cd
+
+- And at `/usr/local/cuda/lib64`
+```
+/usr/local/cuda/lib64/libOpenCL.so -> libOpenCL.so.1*
+/usr/local/cuda/lib64/libOpenCL.so.1 -> libOpenCL.so.1.0*
+/usr/local/cuda/lib64/libOpenCL.so.1.0 -> libOpenCL.so.1.0.0*
+/usr/local/cuda/lib64/libOpenCL.so.1.0.0*
+```
+2. Install OpenCL for Intel onboard GPU
+
+```bash
+sudo add-apt-repository ppa:intel-opencl/intel-opencl # for Ubuntu 18.04
+sudo apt update
+sudo apt install --assume-yes intel-opencl-icd
+# sudo apt install --assume-yes libze-loader libze-intel-gpu
+```
+
+3. Apt
+
+```
+sudo apt update
+sudo apt install ocl-icd-opencl-dev
+```
+- Now libOpenCL.so should be located at /usr/lib/x86_64-linux-gnu/libOpenCL.so
+
+
+## On Jetson
+
+- By default, Jetson boards don't support OpenCL.
+- Start by downloading and extracting Khronos Group's OpenCL Headers from [github](https://github.com/KhronosGroup/OpenCL-Headers).
+- Once extracted move the `CL/` directory into `/usr/include`:
+
+```bash
+sudo mv ~/Downloads/CL /usr/include
+```
+
+- Now if you go into `/usr/lib/aarch64-linux-gnu` you can find the OpenCL library as `libOpenCL.so.1`. We need to add a symbolic link from `libOpenCL.so.1` to `libOpenCL.so`:
+
+```bash
+cd /usr/lib/aarch64-linux-gnu
+sudo ln -s libOpenCL.so.1 libOpenCL.so
+```
+
+# Reference:
 
 - [__OpenCL in action How to accelerate graphics and computations - Matthew Scarpino - November 2011__](https://www.manning.com/books/opencl-in-action)
 
