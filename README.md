@@ -56,6 +56,25 @@ sudo apt install ocl-icd-opencl-dev
 ```
 - Now libOpenCL.so should be located at /usr/lib/x86_64-linux-gnu/libOpenCL.so
 
+## On MacOS
+
+```bash
+xcode-select --install
+
+brew install llvm
+export CPATH="$(brew --prefix llvm)/lib/clang/$(ls "$(brew --prefix llvm)/lib/clang")/include:$CPATH"
+
+cd /Library/Developer/CommandLineTools/SDKs/MacOSX13.sdk/System/Library/Frameworks/OpenCL.framework/Headers
+sudo curl https://raw.githubusercontent.com/KhronosGroup/OpenCL-CLHPP/main/include/CL/opencl.hpp -o opencl.hpp
+sudo curl https://raw.githubusercontent.com/KhronosGroup/OpenCL-CLHPP/main/include/CL/cl2.hpp -o cl2.hpp
+
+clang++ main.cpp \
+        -framework OpenCL \
+        -std=c++2a \
+        -DCL_HPP_TARGET_OPENCL_VERSION=120 \
+        -DCL_HPP_MINIMUM_OPENCL_VERSION=120 \
+        -o app
+```
 
 ## On Jetson
 
@@ -63,17 +82,14 @@ sudo apt install ocl-icd-opencl-dev
 - Start by downloading and extracting Khronos Group's OpenCL Headers from [github](https://github.com/KhronosGroup/OpenCL-Headers).
 - Once extracted move the `CL/` directory into `/usr/include`:
 
-```bash
-git clone https://github.com/KhronosGroup/OpenCL-Headers.git
-sudo mv OpenCL-Headers/CL /usr/include
-sudo wget https://www.khronos.org/registry/OpenCL/api/2.1/cl.hpp -P /usr/include/CL
-```
-
-- Now if you go into `/usr/lib/aarch64-linux-gnu` you can find the OpenCL library as `libOpenCL.so.1`. We need to add a symbolic link from `libOpenCL.so.1` to `libOpenCL.so`:
-
-```bash
-cd /usr/lib/aarch64-linux-gnu
-sudo ln -s libOpenCL.so.1 libOpenCL.so
+```dockerfile
+apt install -y cmake git libclang-10-dev clang-10 llvm-10 make ninja-build ocl-icd-dev zlib1g dialog apt-utils libxml2-dev libclang-cpp10-dev libclang-cpp10 llvm-10-dev libncurses5 ocl-icd-opencl-dev opencl-headers clinfo build-essential pkg-config libtinfo-dev libltdl-dev zlib1g-dev libhwloc-dev libglew-dev libedit-dev clang-format clang-tidy libclang-dev ocl-icd-libopencl1 && \
+    git clone --single-branch --branch release_1_7 https://github.com/pocl/pocl.git && \
+    mkdir -p pocl/build && cd /root/pocl/build && \
+    cmake -DCMAKE_INSTALL_PREFIX=/usr/local/pocl/ -DENABLE_CUDA=ON -DLLC_HOST_CPU=armv8 -DHOST_CPU_CACHELINE_SIZE=64 -DENABLE_ICD=1 .. && make -j$(nproc) && make install && \
+    mkdir -p /etc/OpenCL/vendors/ && \
+    printf "/usr/local/pocl/lib/libpocl.so" >> /etc/OpenCL/vendors/pocl.icd && \
+    cd /root && rm -rf /root/pocl
 ```
 
 <details>
@@ -96,6 +112,7 @@ $(PROJ): $(PROJ).cpp
 clean:
 	rm -f $(PROJ) OpenCL_info.txt
 ```
+</details>
 
 # Reference:
 
