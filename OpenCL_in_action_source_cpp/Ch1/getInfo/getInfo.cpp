@@ -5,7 +5,11 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#ifdef __APPLE__
+#include <OpenCL/opencl.hpp>
+#else
 #include "CL/cl.hpp"
+#endif
 
 int main()
 {
