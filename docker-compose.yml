@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  emoi:
+    image: hienanh/jetson:0.0.5
+    container_name: wopencl_book
+    runtime: nvidia
+    network_mode: host
+    environment:
+      DISPLAY: ${DISPLAY}
+    volumes:
+      - .:/root/Software
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    tty: true
+    stdin_open: true

@@ -68,12 +68,7 @@ cd /Library/Developer/CommandLineTools/SDKs/MacOSX13.sdk/System/Library/Framewor
 sudo curl https://raw.githubusercontent.com/KhronosGroup/OpenCL-CLHPP/main/include/CL/opencl.hpp -o opencl.hpp
 sudo curl https://raw.githubusercontent.com/KhronosGroup/OpenCL-CLHPP/main/include/CL/cl2.hpp -o cl2.hpp
 
-clang++ main.cpp \
-        -framework OpenCL \
-        -std=c++2a \
-        -DCL_HPP_TARGET_OPENCL_VERSION=120 \
-        -DCL_HPP_MINIMUM_OPENCL_VERSION=120 \
-        -o app
+g++ -std=c++11 demo.cc -o demo.bin -framework OpenCL -DAPPLE
 ```
 
 ## On Jetson
