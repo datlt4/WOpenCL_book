@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
-#ifdef MAC
+#ifdef __APPLE__
 #include <OpenCL/cl.h>
 #else
 #include <CL/cl.h>

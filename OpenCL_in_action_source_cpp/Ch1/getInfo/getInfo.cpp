@@ -6,7 +6,7 @@
 #include <fstream>
 #include <sstream>
 #ifdef __APPLE__
-#include <OpenCL/opencl.hpp>
+#include <OpenCL/cl.hpp> // OpenCL 1.2
 #else
 #include "CL/cl.hpp"
 #endif
