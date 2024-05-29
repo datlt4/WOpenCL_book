@@ -1,4 +1,5 @@
 .DS_Store
+.vscode
 
 # Compiled object files
 *.o
