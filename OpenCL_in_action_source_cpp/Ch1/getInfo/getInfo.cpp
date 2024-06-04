@@ -1,133 +1,162 @@
-// #define __NO_STD_STRING
+// Enable OpenCL exceptions
 #define __CL_ENABLE_EXCEPTIONS
 
-#include <iostream>
-#include <vector>
-#include <fstream>
-#include <sstream>
+#include <vector>   // For using std::vector
+#include <iostream> // For standard input/output
 #ifdef __APPLE__
-#include <OpenCL/cl.hpp> // OpenCL 1.2
+#include <OpenCL/cl.hpp> // OpenCL 1.2 for macOS
 #else
-#include "CL/cl.hpp"
+#include "CL/cl.hpp" // OpenCL for other platforms
 #endif
 
-int main()
+int main(int argc, char **argv)
 {
-    std::ostringstream os;
-    std::vector<cl::Platform> platforms;
     try
     {
+        // Create a vector to store the available OpenCL platforms
+        std::vector<cl::Platform> platforms;
+
+        // Get all available OpenCL platforms and store them in the vector
         cl::Platform::get(&platforms);
-        os << "NUMBER OF OPENCL PLATFORMS : " << platforms.size() << std::endl;
-        int count_platform = 0;
+
+        // Output the number of platforms found
+        std::cout << "NUMBER OF OPENCL PLATFORMS: " << platforms.size() << std::endl;
+
+        unsigned int platform_counter = 0;
+
         for (cl::Platform &platform : platforms)
         {
-            os << "+ Platform " << count_platform << ":" << std::endl;
-            os << "\t- CL_PLATFORM_NAME       : " << platform.getInfo<CL_PLATFORM_NAME>() << std::endl;
-            os << "\t- CL_PLATFORM_VENDOR     : " << platform.getInfo<CL_PLATFORM_VENDOR>() << std::endl;
-            os << "\t- CL_PLATFORM_VERSION    : " << platform.getInfo<CL_PLATFORM_VERSION>() << std::endl;
-            os << "\t- CL_PLATFORM_PROFILE    : " << platform.getInfo<CL_PLATFORM_PROFILE>() << std::endl;
-            os << "\t- CL_PLATFORM_EXTENSIONS : " << platform.getInfo<CL_PLATFORM_EXTENSIONS>() << std::endl;
+            std::cout << "+ Platform " << platform_counter++ << std::endl;
+
+            // Error code for platform info retrieval
+            cl_int ec;
+
+            // Define a macro to reduce redundancy when fetching platform info
+
+#define GET_PLATFORM_INFO(param)                                                    \
+    {                                                                               \
+        std::string param_info = platform.getInfo<param>(&ec);                      \
+        if (ec == CL_SUCCESS)                                                       \
+        {                                                                           \
+            std::cout << "\t- " << #param << ": " << param_info << std::endl;       \
+        }                                                                           \
+        else                                                                        \
+        {                                                                           \
+            std::cerr << "\t- Error getting " << #param << ": " << ec << std::endl; \
+        }                                                                           \
+    }
+
+            // Retrieve and print platform info
+            GET_PLATFORM_INFO(CL_PLATFORM_PROFILE);
+            GET_PLATFORM_INFO(CL_PLATFORM_VERSION);
+            GET_PLATFORM_INFO(CL_PLATFORM_NAME);
+            GET_PLATFORM_INFO(CL_PLATFORM_VENDOR);
+            GET_PLATFORM_INFO(CL_PLATFORM_EXTENSIONS);
+#undef GET_PLATFORM_INFO
+
             std::vector<cl::Device> devices;
             platform.getDevices(CL_DEVICE_TYPE_ALL, &devices);
-            os << "\t- NUMBER OF DEVICES      : " << devices.size() << std::endl;
-
-            int count_device = 0;
+            cl_uint device_counter = 0;
+            std::cout << "\n\t- [ DEVICE ] NUMBER OF DEVICES IN PLATFORM: " << devices.size() << std::endl;
             for (cl::Device &device : devices)
             {
-                os << "\n\tDevice : " << count_device << std::endl;
-                os << "\t\t. CL_DEVICE_NAME                          : " << device.getInfo<CL_DEVICE_NAME>() << std::endl;
-                os << "\t\t. CL_DEVICE_VENDOR                        : " << device.getInfo<CL_DEVICE_VENDOR>() << std::endl;
-                os << "\t\t. CL_DRIVER_VERSION                       : " << device.getInfo<CL_DRIVER_VERSION>() << std::endl;
-                os << "\t\t. CL_DEVICE_PROFILE                       : " << device.getInfo<CL_DEVICE_PROFILE>() << std::endl;
-                os << "\t\t. CL_DEVICE_VERSION                       : " << device.getInfo<CL_DEVICE_VERSION>() << std::endl;
-                os << "\t\t. CL_DEVICE_EXTENSIONS                    : " << device.getInfo<CL_DEVICE_EXTENSIONS>() << std::endl;
-                os << "\t\t. CL_DEVICE_PLATFORM                      : " << device.getInfo<CL_DEVICE_PLATFORM>() << std::endl;
-                std::string deviceType;
-                switch (device.getInfo<CL_DEVICE_TYPE>())
-                {
-                case 1 << 0:
-                    deviceType = std::string("CL_DEFAULT");
-                    break;
-                case 1 << 1:
-                    deviceType = std::string("CL_CPU");
-                    break;
-                case 1 << 2:
-                    deviceType = std::string("CL_GPU");
-                    break;
-                case 1 << 3:
-                    deviceType = std::string("CL_ACCELERATOR");
-                    break;
-                default:
-                    break;
-                }
-                os << "\t\t. CL_DEVICE_TYPE                          : " << deviceType << std::endl;
-                os << "\t\t. CL_DEVICE_VENDOR_ID                     : " << device.getInfo<CL_DEVICE_VENDOR_ID>() << std::endl;
-                os << "\t\t. CL_DEVICE_MAX_COMPUTE_UNITS             : " << device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>() << std::endl;
-                os << "\t\t. CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS      : " << device.getInfo<CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS>() << std::endl;
-                os << "\t\t. CL_DEVICE_MAX_WORK_GROUP_SIZE           : " << device.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>() << std::endl;
-                std::vector<std::size_t> maxWorkItems = device.getInfo<CL_DEVICE_MAX_WORK_ITEM_SIZES>();
-                // os << "\t\t. CL_DEVICE_MAX_WORK_ITEM_SIZES           : " << device.getInfo<CL_DEVICE_MAX_WORK_ITEM_SIZES>() << std::endl;
-                for (int i = 0; i < maxWorkItems.size(); i++)
-                {
-                    if (i == 0)
-                    {
-                        os << "\t\t. CL_DEVICE_MAX_WORK_ITEM_SIZES           : " << maxWorkItems[i];
-                    }
-                    else
-                    {
-                        os << "x" << maxWorkItems[i];
-                    }
-                }
-                os << std::endl;
-                os << "\t\t. CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR   : " << device.getInfo<CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR>() << std::endl;
-                os << "\t\t. CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT  : " << device.getInfo<CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT>() << std::endl;
-                os << "\t\t. CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT    : " << device.getInfo<CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT>() << std::endl;
-                os << "\t\t. CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG   : " << device.getInfo<CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG>() << std::endl;
-                os << "\t\t. CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT  : " << device.getInfo<CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT>() << std::endl;
-                os << "\t\t. CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE : " << device.getInfo<CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE>() << std::endl;
-                os << "\t\t. CL_DEVICE_MAX_CLOCK_FREQUENCY           : " << device.getInfo<CL_DEVICE_MAX_CLOCK_FREQUENCY>() << std::endl;
-                os << "\t\t. CL_DEVICE_ADDRESS_BITS                  : " << device.getInfo<CL_DEVICE_ADDRESS_BITS>() << std::endl;
-                os << "\t\t. CL_DEVICE_MAX_READ_IMAGE_ARGS           : " << device.getInfo<CL_DEVICE_MAX_READ_IMAGE_ARGS>() << std::endl;
-                os << "\t\t. CL_DEVICE_MAX_WRITE_IMAGE_ARGS          : " << device.getInfo<CL_DEVICE_MAX_WRITE_IMAGE_ARGS>() << std::endl;
-                os << "\t\t. CL_DEVICE_MAX_MEM_ALLOC_SIZE            : " << device.getInfo<CL_DEVICE_MAX_MEM_ALLOC_SIZE>() << std::endl;
-                os << "\t\t. CL_DEVICE_IMAGE2D_MAX_WIDTH             : " << device.getInfo<CL_DEVICE_IMAGE2D_MAX_WIDTH>() << std::endl;
-                os << "\t\t. CL_DEVICE_IMAGE2D_MAX_HEIGHT            : " << device.getInfo<CL_DEVICE_IMAGE2D_MAX_HEIGHT>() << std::endl;
-                os << "\t\t. CL_DEVICE_IMAGE3D_MAX_WIDTH             : " << device.getInfo<CL_DEVICE_IMAGE3D_MAX_WIDTH>() << std::endl;
-                os << "\t\t. CL_DEVICE_IMAGE3D_MAX_HEIGHT            : " << device.getInfo<CL_DEVICE_IMAGE3D_MAX_HEIGHT>() << std::endl;
-                os << "\t\t. CL_DEVICE_IMAGE3D_MAX_DEPTH             : " << device.getInfo<CL_DEVICE_IMAGE3D_MAX_DEPTH>() << std::endl;
-                os << "\t\t. CL_DEVICE_IMAGE_SUPPORT                 : " << device.getInfo<CL_DEVICE_IMAGE_SUPPORT>() << std::endl;
-                os << "\t\t. CL_DEVICE_MAX_PARAMETER_SIZE            : " << device.getInfo<CL_DEVICE_MAX_PARAMETER_SIZE>() << std::endl;
-                os << "\t\t. CL_DEVICE_MAX_SAMPLERS                  : " << device.getInfo<CL_DEVICE_MAX_SAMPLERS>() << std::endl;
-                os << "\t\t. CL_DEVICE_MEM_BASE_ADDR_ALIGN           : " << device.getInfo<CL_DEVICE_MEM_BASE_ADDR_ALIGN>() << std::endl;
-                os << "\t\t. CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE      : " << device.getInfo<CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE>() << std::endl;
-                os << "\t\t. CL_DEVICE_SINGLE_FP_CONFIG              : " << device.getInfo<CL_DEVICE_SINGLE_FP_CONFIG>() << std::endl;
-                os << "\t\t. CL_DEVICE_GLOBAL_MEM_CACHE_TYPE         : " << device.getInfo<CL_DEVICE_GLOBAL_MEM_CACHE_TYPE>() << std::endl;
-                os << "\t\t. CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE     : " << device.getInfo<CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE>() << std::endl;
-                os << "\t\t. CL_DEVICE_GLOBAL_MEM_CACHE_SIZE         : " << device.getInfo<CL_DEVICE_GLOBAL_MEM_CACHE_SIZE>() << std::endl;
-                os << "\t\t. CL_DEVICE_GLOBAL_MEM_SIZE               : " << device.getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>() << std::endl;
-                os << "\t\t. CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE      : " << device.getInfo<CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE>() << std::endl;
-                os << "\t\t. CL_DEVICE_MAX_CONSTANT_ARGS             : " << device.getInfo<CL_DEVICE_MAX_CONSTANT_ARGS>() << std::endl;
-                os << "\t\t. CL_DEVICE_LOCAL_MEM_TYPE                : " << device.getInfo<CL_DEVICE_LOCAL_MEM_TYPE>() << std::endl;
-                os << "\t\t. CL_DEVICE_LOCAL_MEM_SIZE                : " << device.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>() << std::endl;
-                os << "\t\t. CL_DEVICE_ERROR_CORRECTION_SUPPORT      : " << device.getInfo<CL_DEVICE_ERROR_CORRECTION_SUPPORT>() << std::endl;
-                os << "\t\t. CL_DEVICE_PROFILING_TIMER_RESOLUTION    : " << device.getInfo<CL_DEVICE_PROFILING_TIMER_RESOLUTION>() << std::endl;
-                os << "\t\t. CL_DEVICE_ENDIAN_LITTLE                 : " << device.getInfo<CL_DEVICE_ENDIAN_LITTLE>() << std::endl;
-                os << "\t\t. CL_DEVICE_AVAILABLE                     : " << device.getInfo<CL_DEVICE_AVAILABLE>() << std::endl;
-                os << "\t\t. CL_DEVICE_COMPILER_AVAILABLE            : " << device.getInfo<CL_DEVICE_COMPILER_AVAILABLE>() << std::endl;
-                os << "\t\t. CL_DEVICE_EXECUTION_CAPABILITIES        : " << device.getInfo<CL_DEVICE_EXECUTION_CAPABILITIES>() << std::endl;
-                os << "\t\t. CL_DEVICE_QUEUE_PROPERTIES              : " << device.getInfo<CL_DEVICE_QUEUE_PROPERTIES>() << std::endl;
-                count_device++;
+                std::cout << "\n\t\t. [ DEVICE ] " << device_counter++ << std::endl;
+
+#define GET_DEVICE_INFO(param)                                                                                                                     \
+    {                                                                                                                                              \
+        auto param_info = device.getInfo<param>(&ec);                                                                                              \
+        if (ec == CL_SUCCESS)                                                                                                                      \
+        {                                                                                                                                          \
+            if (param == CL_DEVICE_TYPE)                                                                                                           \
+            {                                                                                                                                      \
+                std::cout << "\t\t. " << #param << ": " << param_info << " (" << CL_DEVICE_TYPE_DEFAULT << " : CL_DEVICE_TYPE_DEFAULT, "           \
+                          << CL_DEVICE_TYPE_CPU << " : CL_DEVICE_TYPE_CPU, " << CL_DEVICE_TYPE_GPU << " : CL_DEVICE_TYPE_GPU, "                    \
+                          << CL_DEVICE_TYPE_ACCELERATOR << " : CL_DEVICE_TYPE_ACCELERATOR" << CL_DEVICE_TYPE_CUSTOM << " : CL_DEVICE_TYPE_CUSTOM)" \
+                          << "other : UNKNOWN" << std::endl;                                                                                       \
+            }                                                                                                                                      \
+            else                                                                                                                                   \
+            {                                                                                                                                      \
+                std::cout << "\t\t. " << #param << ": " << param_info << std::endl;                                                                \
+            }                                                                                                                                      \
+        }                                                                                                                                          \
+        else                                                                                                                                       \
+        {                                                                                                                                          \
+            std::cerr << "\t\t. Error getting " << #param << ": " << ec << std::endl;                                                              \
+        }                                                                                                                                          \
+    }
+
+                // Retrieve and print device info
+                GET_DEVICE_INFO(CL_DEVICE_TYPE);
+                GET_DEVICE_INFO(CL_DEVICE_VENDOR);
+                GET_DEVICE_INFO(CL_DEVICE_VENDOR_ID);
+                GET_DEVICE_INFO(CL_DEVICE_VERSION);
+                GET_DEVICE_INFO(CL_DRIVER_VERSION);
+                GET_DEVICE_INFO(CL_DEVICE_OPENCL_C_VERSION);
+                GET_DEVICE_INFO(CL_DEVICE_ADDRESS_BITS);
+                GET_DEVICE_INFO(CL_DEVICE_NAME);
+                GET_DEVICE_INFO(CL_DEVICE_PARENT_DEVICE);
+                GET_DEVICE_INFO(CL_DEVICE_AVAILABLE);
+                GET_DEVICE_INFO(CL_DEVICE_BUILT_IN_KERNELS);
+                GET_DEVICE_INFO(CL_DEVICE_COMPILER_AVAILABLE);
+                GET_DEVICE_INFO(CL_DEVICE_DOUBLE_FP_CONFIG);
+                GET_DEVICE_INFO(CL_DEVICE_ENDIAN_LITTLE);
+                GET_DEVICE_INFO(CL_DEVICE_ERROR_CORRECTION_SUPPORT);
+                GET_DEVICE_INFO(CL_DEVICE_EXECUTION_CAPABILITIES);
+                GET_DEVICE_INFO(CL_DEVICE_EXTENSIONS);
+                GET_DEVICE_INFO(CL_DEVICE_GLOBAL_MEM_CACHE_SIZE);
+                GET_DEVICE_INFO(CL_DEVICE_GLOBAL_MEM_CACHE_TYPE);
+                GET_DEVICE_INFO(CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE);
+                GET_DEVICE_INFO(CL_DEVICE_GLOBAL_MEM_SIZE);
+                GET_DEVICE_INFO(CL_DEVICE_IMAGE2D_MAX_HEIGHT);
+                GET_DEVICE_INFO(CL_DEVICE_IMAGE2D_MAX_WIDTH);
+                GET_DEVICE_INFO(CL_DEVICE_IMAGE3D_MAX_DEPTH);
+                GET_DEVICE_INFO(CL_DEVICE_IMAGE3D_MAX_HEIGHT);
+                GET_DEVICE_INFO(CL_DEVICE_IMAGE3D_MAX_WIDTH);
+                // GET_DEVICE_INFO(CL_DEVICE_IMAGE_MAX_ARRAY_SIZE);
+                // GET_DEVICE_INFO(CL_DEVICE_IMAGE_MAX_BUFFER_SIZE);
+                // GET_DEVICE_INFO(CL_DEVICE_IMAGE_PITCH_ALIGNMENT);
+                GET_DEVICE_INFO(CL_DEVICE_IMAGE_SUPPORT);
+                // GET_DEVICE_INFO(CL_DEVICE_LINKER_AVAILABLE);
+                GET_DEVICE_INFO(CL_DEVICE_LOCAL_MEM_SIZE);
+                GET_DEVICE_INFO(CL_DEVICE_LOCAL_MEM_TYPE);
+                GET_DEVICE_INFO(CL_DEVICE_MAX_CLOCK_FREQUENCY);
+                GET_DEVICE_INFO(CL_DEVICE_MAX_COMPUTE_UNITS);
+                GET_DEVICE_INFO(CL_DEVICE_MAX_CONSTANT_ARGS);
+                GET_DEVICE_INFO(CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE);
+                GET_DEVICE_INFO(CL_DEVICE_MAX_MEM_ALLOC_SIZE);
+                GET_DEVICE_INFO(CL_DEVICE_MAX_PARAMETER_SIZE);
+                GET_DEVICE_INFO(CL_DEVICE_MAX_READ_IMAGE_ARGS);
+                GET_DEVICE_INFO(CL_DEVICE_MAX_SAMPLERS);
+                GET_DEVICE_INFO(CL_DEVICE_MAX_WORK_GROUP_SIZE);
+                GET_DEVICE_INFO(CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS);
+                // GET_DEVICE_INFO(CL_DEVICE_MAX_WORK_ITEM_SIZES);
+                GET_DEVICE_INFO(CL_DEVICE_MAX_WRITE_IMAGE_ARGS);
+                GET_DEVICE_INFO(CL_DEVICE_MEM_BASE_ADDR_ALIGN);
+                GET_DEVICE_INFO(CL_DEVICE_PARTITION_AFFINITY_DOMAIN);
+                // GET_DEVICE_INFO(CL_DEVICE_PARTITION_MAX_SUB_DEVICES);
+                // GET_DEVICE_INFO(CL_DEVICE_PARTITION_PROPERTIES);
+                // GET_DEVICE_INFO(CL_DEVICE_PARTITION_TYPE);
+                GET_DEVICE_INFO(CL_DEVICE_PLATFORM);
+                // GET_DEVICE_INFO(CL_DEVICE_PRINTF_BUFFER_SIZE);
+                GET_DEVICE_INFO(CL_DEVICE_PROFILE);
+                GET_DEVICE_INFO(CL_DEVICE_PROFILING_TIMER_RESOLUTION);
+                GET_DEVICE_INFO(CL_DEVICE_REFERENCE_COUNT);
+                GET_DEVICE_INFO(CL_DEVICE_SINGLE_FP_CONFIG);
+#undef GET_DEVICE_INFO
             }
-            count_platform++;
         }
     }
-    catch (cl::Error e)
+    catch (const cl::Error &e) // Catch OpenCL specific exceptions
     {
-        os << e.what() << ": Error code " << e.err() << std::endl;
+        // Print OpenCL error message and error code
+        std::cout << "OpenCL Error: " << e.what() << ": Error code " << e.err() << std::endl;
     }
-    std::ofstream outFile("OpenCL_info.txt");
-    outFile << os.str() << std::endl;
-    outFile.close();
+    catch (const std::exception &e) // Catch standard exceptions
+    {
+        // Print standard error message
+        std::cerr << "Standard Error: " << e.what() << '\n';
+    }
+
+    // Return 0 to indicate successful execution
     return 0;
 }

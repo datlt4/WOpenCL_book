@@ -67,6 +67,9 @@ export CPATH="$(brew --prefix llvm)/lib/clang/$(ls "$(brew --prefix llvm)/lib/cl
 cd /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks/OpenCL.framework/Versions/A/Headers
 sudo wget https://raw.githubusercontent.com/crosswalk-project/khronos-cl-api-1.2/master/cl.hpp
 
+cd /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenCL.framework/Headers
+sudo wget https://raw.githubusercontent.com/crosswalk-project/khronos-cl-api-1.2/master/cl.hpp
+
 g++ -std=c++11 demo.cc -o demo.bin -framework OpenCL -DAPPLE
 ```
 

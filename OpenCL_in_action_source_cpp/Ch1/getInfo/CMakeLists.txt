@@ -2,14 +2,15 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project name
-project(getInfo)
+project(getInfo_app)
 
 # Set the C++ standard
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Source file
-set(SRC getInfo.cpp)
+# Source files
+set(CPP_SRC getInfo.cpp)
+set(C_SRC getInfo.c)
 
 # Check if building on macOS
 if(APPLE)
@@ -28,7 +29,13 @@ endif()
 
 # Include directories (add as needed)
 include_directories($INC)
-# Add the executable target
-add_executable(getInfo ${SRC})
-# Link the OpenCL library
-target_link_libraries(getInfo ${LIB})
+
+# Add the executable target for the C++ application
+add_executable(getInfo_cpp_app ${CPP_SRC})
+# Link the OpenCL library for the C++ application
+target_link_libraries(getInfo_cpp_app ${LIB})
+
+# Add the executable target for the C application
+add_executable(getInfo_c_app ${C_SRC})
+# Link the OpenCL library for the C application
+target_link_libraries(getInfo_c_app ${LIB})
