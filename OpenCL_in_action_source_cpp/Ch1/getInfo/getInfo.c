@@ -7,6 +7,7 @@
 #include <stdio.h>     // For standard input/output functions
 #include <stdlib.h>    // For memory allocation functions
 #include <sys/types.h> // For defining data types
+#include <inttypes.h> // This header provides the correct macros for printing fixed-width integer types.
 
 #ifdef __APPLE__
 #include <OpenCL/cl.h> // Include OpenCL headers for macOS
@@ -109,7 +110,7 @@ int main(int argc, char **argv)
         case CL_DEVICE_LOCAL_MEM_SIZE:                                                                                          \
         case CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE:                                                                                \
         case CL_DEVICE_MAX_MEM_ALLOC_SIZE:                                                                                      \
-            printf("\t\t. %s: %llu (%lu)\n", #param, *((cl_ulong *)device_info_char), device_info_char_len);                    \
+            printf("\t\t. %s: %" PRIu64 " (%lu)\n", #param, *((cl_ulong *)device_info_char), device_info_char_len);                    \
             break;                                                                                                              \
         case CL_DEVICE_ADDRESS_BITS:                                                                                            \
         case CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE:                                                                               \
@@ -178,13 +179,13 @@ int main(int argc, char **argv)
             break;                                                                                                              \
         case CL_DEVICE_SINGLE_FP_CONFIG:                                                                                        \
         case CL_DEVICE_DOUBLE_FP_CONFIG:                                                                                        \
-            printf("\t\t. %s: %llu (%lu)\n", #param, *((cl_device_fp_config *)device_info_char), device_info_char_len);         \
+            printf("\t\t. %s: %" PRIu64 " (%lu)\n", #param, *((cl_device_fp_config *)device_info_char), device_info_char_len);         \
             break;                                                                                                              \
         case CL_DEVICE_EXECUTION_CAPABILITIES:                                                                                  \
-            printf("\t\t. %s: %llu (%lu)\n", #param, *((cl_device_exec_capabilities *)device_info_char), device_info_char_len); \
+            printf("\t\t. %s: %" PRIu64 " (%lu)\n", #param, *((cl_device_exec_capabilities *)device_info_char), device_info_char_len); \
             break;                                                                                                              \
         case CL_DEVICE_PARTITION_AFFINITY_DOMAIN:                                                                               \
-            printf("\t\t. %s: %llu (%lu)\n", #param, *((cl_device_type *)device_info_char), device_info_char_len);              \
+            printf("\t\t. %s: %" PRIu64 " (%lu)\n", #param, *((cl_device_type *)device_info_char), device_info_char_len);              \
             break;                                                                                                              \
         default:                                                                                                                \
             printf("\t\t. %s: Not support for querying\n", #param);                                                             \
