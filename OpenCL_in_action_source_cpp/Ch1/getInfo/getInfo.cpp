@@ -19,6 +19,12 @@ int main(int argc, char **argv)
         // Get all available OpenCL platforms and store them in the vector
         cl::Platform::get(&platforms);
 
+        if (platforms.empty())
+        {
+            std::cerr << "No platform found!" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+
         // Output the number of platforms found
         std::cout << "NUMBER OF OPENCL PLATFORMS: " << platforms.size() << std::endl;
 
@@ -56,6 +62,11 @@ int main(int argc, char **argv)
 
             std::vector<cl::Device> devices;
             platform.getDevices(CL_DEVICE_TYPE_ALL, &devices);
+            if (devices.empty())
+            {
+                std::cerr << "No devices found on platform" << std::endl;
+                exit(EXIT_FAILURE);
+            }
             cl_uint device_counter = 0;
             std::cout << "\n\t- [ DEVICE ] NUMBER OF DEVICES IN PLATFORM: " << devices.size() << std::endl;
             for (cl::Device &device : devices)
@@ -143,6 +154,30 @@ int main(int argc, char **argv)
                 GET_DEVICE_INFO(CL_DEVICE_REFERENCE_COUNT);
                 GET_DEVICE_INFO(CL_DEVICE_SINGLE_FP_CONFIG);
 #undef GET_DEVICE_INFO
+                // Create context
+                cl_context_properties properties[] = {CL_CONTEXT_PLATFORM, (cl_context_properties)platform(), 0};
+                cl::Context context(devices, properties, nullptr, nullptr, &ec);
+                // cl::Context context(devices, nullptr, nullptr, nullptr, &ec);
+                if (ec != CL_SUCCESS)
+                {
+                    std::cout << "\t\t[ERROR] couldn't create the context with this device" << std::endl;
+                }
+                else
+                {
+                    std::cout << "\t\t[SUCCESS] Create the context successfully!" << std::endl;
+                }
+
+                // cl_context context = clCreateContext(NULL, 1, &device(), NULL, NULL, &ec);
+
+                // Use the context for OpenCL operations...
+                // Context will be automatically released when it goes out of scope
+
+                /** Devices are typically managed implicitly through contexts.
+                 * When you create a context, you specify the devices it will use.
+                 * The context manages the devices internally, and releasing the context properly cleans up the associated device resources.
+                 * Therefore, you don't need to explicitly release devices in most cases.
+                 * // clReleaseDevice(devices[j]); [Unnecessary]
+                 */
             }
         }
     }
