@@ -5,7 +5,7 @@ CXXFLAGS=-std=c++20
 CFLAGS=-std=c11
 
 # Project names
-PROJ=getInfo
+PROJ=platform_ext_test
 PROJ_CPP=$(PROJ).cpp_app
 PROJ_C=$(PROJ).c_app
 

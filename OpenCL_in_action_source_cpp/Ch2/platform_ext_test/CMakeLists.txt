@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project name
-project(getInfo)
+project(platform_ext_test)
 
 # Set the C++ standard
 set(CMAKE_CXX_STANDARD 20)
@@ -39,4 +39,3 @@ target_link_libraries(${PROJECT_NAME}.cpp_app ${LIB})
 add_executable(${PROJECT_NAME}.c_app ${C_SRC})
 # Link the OpenCL library for the C application
 target_link_libraries(${PROJECT_NAME}.c_app ${LIB})
-
