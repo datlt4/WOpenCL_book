@@ -1,7 +1,6 @@
 # Compiler and flags
 CXX=g++
 CC=gcc
-CXXFLAGS=-std=c++20
 CFLAGS=-std=c11
 
 # Project names
@@ -14,11 +13,13 @@ UNAME_S := $(shell uname -s)
 
 # Include and library directories and libraries
 ifeq ($(UNAME_S), Linux)
+    CXXFLAGS=-std=c++2a
     INC_DIRS=-I /usr/local/cuda/include
     LIB_DIRS=-L /usr/local/cuda/lib64
     LIBS=-lOpenCL
     DEFINES=
 else ifeq ($(UNAME_S), Darwin)
+    CXXFLAGS=-std=c++20
     INC_DIRS=
     LIB_DIRS=
     LIBS=-framework OpenCL

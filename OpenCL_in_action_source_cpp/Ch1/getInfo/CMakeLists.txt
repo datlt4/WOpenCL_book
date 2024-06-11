@@ -9,8 +9,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Source files
-set(CPP_SRC platform_ext_test.cpp)
-set(C_SRC platform_ext_test.c)
+set(CPP_SRC getInfo.cpp)
+set(C_SRC getInfo.c)
 
 # Check if building on macOS
 if(APPLE)
