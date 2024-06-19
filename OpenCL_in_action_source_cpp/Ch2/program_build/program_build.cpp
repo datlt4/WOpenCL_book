@@ -49,7 +49,7 @@ int main(int argc, char **argv)
         std::cout << "Couldn't create a context" << std::endl;
     }
 
-    const std::vector<const std::string> program_file_list = {PROGRAM_FILE_1, PROGRAM_FILE_2};
+    const std::vector<std::string> program_file_list = {PROGRAM_FILE_1, PROGRAM_FILE_2};
     std::string program_buffer;
     for (const std::string &filename : program_file_list)
     {

@@ -1,7 +1,7 @@
 // Enable OpenCL exceptions and disable secure warnings in Visual Studio
 
 // #define __NO_STD_STRING
-#define __CL_ENABLE_EXCEPTIONS // Enable OpenCL exceptions
+#define __CL_ENABLE_EXCEPTIONS  // Enable OpenCL exceptions
 #define _CRT_SECURE_NO_WARNINGS // Disable secure warnings
 
 #include <stdio.h>     // For standard input/output functions
@@ -146,7 +146,7 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    printf("OpenCL program built successfully!");
+    printf("OpenCL program built successfully!\n");
 
     // Free allocated memory after successful program build
     for (int i = 0; i < NUM_FILES; ++i)
