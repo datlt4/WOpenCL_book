@@ -16,7 +16,7 @@ ifeq ($(UNAME_S), Linux)
     CXXFLAGS=-std=c++2a
     INC_DIRS=-I /usr/local/cuda/include
     LIB_DIRS=-L /usr/local/cuda/lib64
-    LIBS=-lOpenCL
+    LIBS=-lOpenCL -pthread
     DEFINES=
 else ifeq ($(UNAME_S), Darwin)
     CXXFLAGS=-std=c++20

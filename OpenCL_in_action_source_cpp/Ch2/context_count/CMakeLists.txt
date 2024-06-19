@@ -25,6 +25,8 @@ else() # GPU NVIDIA
     link_directories(/usr/local/cuda/lib64)
     # Link the OpenCL library for non-macOS
     set(LIB ${LIB} OpenCL)
+    # Link the multithread library for non-macOS
+    set(LIB ${LIB} pthread)
 endif()
 
 # Include directories (add as needed)
