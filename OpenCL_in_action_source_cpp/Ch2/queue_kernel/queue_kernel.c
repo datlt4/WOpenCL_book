@@ -163,6 +163,10 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
+    char fn_name[100];
+    clGetKernelInfo(kernel, CL_KERNEL_FUNCTION_NAME, sizeof(fn_name), fn_name, NULL);
+    printf("Kernel %s.\n", fn_name);
+
     err = clEnqueueTask(queue, kernel, 0, NULL, NULL);
     if (err != CL_SUCCESS)
     {
@@ -177,7 +181,7 @@ int main(int argc, char **argv)
     {
         char fn_name[100];
         clGetKernelInfo(kernel, CL_KERNEL_FUNCTION_NAME, sizeof(fn_name), fn_name, NULL);
-        printf("Function %s was enqueued to command queue.\n");
+        printf("Function %s was enqueued to command queue.\n", KERNEL_NAME);
     }
 
     clReleaseCommandQueue(queue);

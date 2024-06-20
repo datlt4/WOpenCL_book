@@ -1,1 +1,4 @@
-__kernel void blank(__global float *a) {}
+__kernel void blank() {
+  // No-op
+  0;
+}
