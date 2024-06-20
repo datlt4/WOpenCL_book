@@ -145,7 +145,6 @@ int main(int argc, char **argv)
     printf("OpenCL program built successfully!\n");
 
     cl_kernel kernel;
-    cl_uint num_kernels;
     kernel = clCreateKernel(program, KERNEL_NAME, &err);
     if (err != CL_SUCCESS)
     {
@@ -156,7 +155,7 @@ int main(int argc, char **argv)
     }
 
     cl_command_queue queue;
-    queue = clCreateCommandQueue(context, device, 0, &err);
+    queue = clCreateCommandQueue(context, device, 0, &err); // clCreateCommandQueue is deprecated
     if (err < 0)
     {
         perror("Couldn't create the command queue\n");
@@ -167,7 +166,7 @@ int main(int argc, char **argv)
     clGetKernelInfo(kernel, CL_KERNEL_FUNCTION_NAME, sizeof(fn_name), fn_name, NULL);
     printf("Kernel %s.\n", fn_name);
 
-    err = clEnqueueTask(queue, kernel, 0, NULL, NULL);
+    err = clEnqueueTask(queue, kernel, 0, NULL, NULL); // clEnqueueTask is deprecated
     if (err != CL_SUCCESS)
     {
         perror("Couldn't enqueue the kernel execution command\n");

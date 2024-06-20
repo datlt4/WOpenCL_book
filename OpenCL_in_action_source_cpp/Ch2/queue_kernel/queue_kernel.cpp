@@ -95,10 +95,17 @@ int main(int argc, char **argv)
         }
 
         // Print kernel function names
-        for (auto &kernel : kernels)
+        std::string functionName = kernels.front().getInfo<CL_KERNEL_FUNCTION_NAME>();
+        std::cout << "Kernel name: " << functionName << std::endl;
+
+        cl::CommandQueue queue(context, device, 0);
+        if (!queue.enqueueTask(kernels.front()))
         {
-            std::string functionName = kernel.getInfo<CL_KERNEL_FUNCTION_NAME>();
-            std::cout << "Function name: " << functionName << std::endl;
+            std::cerr << "Couldn't enqueue the kernel execution command" << std::endl;
+        }
+        else
+        {
+            std::cout << "Function " << functionName << " was enqueued to command queue." << std::endl;
         }
     }
     catch (cl::Error &e)
