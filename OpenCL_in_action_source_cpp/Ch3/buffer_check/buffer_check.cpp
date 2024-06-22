@@ -128,14 +128,14 @@ int main(int argc, char **argv)
         }
 
         /* Create a sub-buffer */
-        size_t alignment = 0;              // Adjust this according to device requirements if needed
         size_t origin = 5 * sizeof(float); // Example origin
         size_t size = 30 * sizeof(float);  // Example size
 
-        // Adjust origin to meet alignment requirements if necessary
-        if (origin % alignment != 0)
+        // Check if size exceeds the parent buffer's size
+        if (origin + size > sizeof(main_data))
         {
-            origin += alignment - (origin % alignment);
+            printf("Error: Sub-buffer size exceeds parent buffer size\n");
+            exit(EXIT_FAILURE);
         }
 
         // Check if size exceeds the parent buffer's size
