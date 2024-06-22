@@ -30,6 +30,13 @@ else() # GPU NVIDIA
     # Find the OpenCL library for non-macOS
     find_library(OpenCL_LIBRARY OpenCL PATHS ${CUDA_LIB_DIRS})
     set(LIB ${OpenCL_LIBRARY})
+    if(IS_ARMV8)
+        # Define the CL_VERSION_2_x macro to indicate OpenCL 2.x support
+        add_definitions(-DCL_VERSION_2_x)
+    elseif(IS_X64)
+        # Define the CL_VERSION_3_x macro to indicate OpenCL 3.x support
+        add_definitions(-DCL_VERSION_3_x)
+    endif()
 endif()
 
 # Include directories (add as needed)

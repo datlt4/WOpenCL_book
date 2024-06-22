@@ -101,6 +101,21 @@ int main(int argc, char **argv)
 
         // Create command queue
         cl::CommandQueue queue(context, device);
+#if defined(CL_VERSION_3_x)
+        // Determine global and local sizes
+        size_t dataSize = 1024;                                                   // Example data size
+        size_t localSize = 64;                                                    // Local work-group size
+        size_t globalSize = ((dataSize + localSize - 1) / localSize) * localSize; // Ensures globalSize is a multiple of localSize
+        if (queue.enqueueNDRangeKernel(kernels.front(), cl::NullRange, cl::NDRange(globalSize), cl::NDRange(localSize)) != CL_SUCCESS)
+        {
+            std::cerr << "Couldn't enqueue the kernel execution command" << std::endl;
+        }
+        else
+        {
+            std::cout << "Function " << functionName << " was enqueued to command queue." << std::endl;
+            queue.finish(); // Ensure the kernel execution completes
+        }
+#else
         if (queue.enqueueTask(kernels.front()) != CL_SUCCESS)
         {
             std::cerr << "Couldn't enqueue the kernel execution command" << std::endl;
@@ -110,6 +125,7 @@ int main(int argc, char **argv)
             std::cout << "Function " << functionName << " was enqueued to command queue." << std::endl;
             queue.finish(); // Ensure the kernel execution completes
         }
+#endif
     }
     catch (cl::Error &e)
     {
