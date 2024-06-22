@@ -1,131 +1,168 @@
 // Enable OpenCL exceptions
 #define __CL_ENABLE_EXCEPTIONS
 
-#include <vector>   // For using std::vector
-#include <iostream> // For standard input/output
-#include <string>
-#include <thread>
-#include <chrono>
-#include <fstream>
-#include <utility>
+// Standard C++ headers
+#include <vector>    // For using std::vector
+#include <iostream>  // For standard input/output
+#include <string>    // For std::string operations
+#include <fstream>   // For file input/output operations
+#include <utility>   // For std::make_pair
+#include <stdexcept> // For std::exception handling
+
 #ifdef __APPLE__
-#include <OpenCL/cl.hpp> // OpenCL 1.2 for macOS
+#include <OpenCL/cl.hpp> // OpenCL 1.2 for macOS using C++ bindings
 #else
-#include "CL/cl.hpp" // OpenCL for other platforms
+#include "CL/cl.hpp" // OpenCL for other platforms using C++ bindings
 #endif
 
-#define PROGRAM_FILE "blank.cl"
+/* Function to find a GPU or CPU associated with the first available platform */
+cl::Device create_device()
+{
+    // Vector to store available platforms
+    std::vector<cl::Platform> platforms;
+    cl::Platform::get(&platforms); // Get available OpenCL platforms
+
+    if (platforms.empty())
+    {
+        std::cerr << "Couldn't find any platforms" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    cl::Device device;
+
+    // Iterate through each platform to find GPU or CPU device
+    for (auto &platform : platforms)
+    {
+        std::vector<cl::Device> devices;
+
+        // Check for GPU devices first
+        platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
+        if (!devices.empty())
+        {
+            device = devices.back(); // Choose the last GPU device
+            break;
+        }
+
+        // If no GPU device found, check for CPU devices
+        platform.getDevices(CL_DEVICE_TYPE_CPU, &devices);
+        if (!devices.empty())
+        {
+            device = devices.front(); // Choose the first CPU device
+            break;
+        }
+    }
+
+    if (!device())
+    {
+        std::cerr << "Couldn't find any devices in platform" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        std::cout << "Device: " << device.getInfo<CL_DEVICE_NAME>() << std::endl;
+    }
+
+    return device;
+}
+
+/* Function to create OpenCL program from a file and compile it */
+cl::Program build_program(cl::Context &context, cl::Device &device, const char *filename)
+{
+    // Read the OpenCL program source code from file
+    std::ifstream programFile(filename);
+    if (!programFile.is_open())
+    {
+        std::cerr << "Error opening file \"" << filename << "\"" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    // Read the program source into a string
+    std::string programBuffer((std::istreambuf_iterator<char>(programFile)),
+                              std::istreambuf_iterator<char>());
+    programFile.close();
+
+    // Create OpenCL program from the source code
+    cl::Program::Sources sources(1, std::make_pair(programBuffer.c_str(), programBuffer.length() + 1));
+    cl::Program program(context, sources);
+
+    // Build the OpenCL program
+    try
+    {
+        if (program.build({device}) != CL_SUCCESS)
+        {
+            std::cerr << "Error building: " << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device) << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+    catch (cl::Error &e)
+    {
+        std::cerr << "OpenCL error: " << e.what() << " (" << e.err() << ")" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    std::cout << "OpenCL program built successfully!" << std::endl;
+    return program;
+}
 
 int main(int argc, char **argv)
 {
     try
     {
-        // Identify a platform
-        std::vector<cl::Platform> platforms;
-        cl::Platform::get(&platforms);
+        // Create OpenCL device
+        cl::Device device = create_device();
 
-        if (platforms.empty())
-        {
-            std::cerr << "Couldn't find any platforms" << std::endl;
-            return EXIT_FAILURE;
-        }
-
-        // Access a device, preferably a GPU
-        cl::Device device;
-        for (auto &platform : platforms)
-        {
-            std::vector<cl::Device> devices;
-            platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
-            if (!devices.empty())
-            {
-                device = devices.back();
-                break;
-            }
-
-            platform.getDevices(CL_DEVICE_TYPE_CPU, &devices);
-            if (!devices.empty())
-            {
-                device = devices.front();
-                break;
-            }
-        }
-
-        if (!device())
-        {
-            std::cerr << "Couldn't find any devices in platform" << std::endl;
-            return EXIT_FAILURE;
-        }
-        else
-        {
-            std::cout << "Device: " << device.getInfo<CL_DEVICE_NAME>() << std::endl;
-        }
-
-        // Create an OpenCL context
+        // Create OpenCL context
         cl::Context context(device);
 
-        // Read the OpenCL program source code from file
-        std::ifstream programFile(PROGRAM_FILE);
-        if (!programFile.is_open())
+        /* Example main data array */
+        float main_data[100]; // Example: array of 100 floats
+
+        cl_int err;
+        // Create main buffer
+        cl::Buffer main_buffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                               sizeof(main_data), &main_data, &err);
+        if (err != CL_SUCCESS)
         {
-            std::cerr << "Error opening file \"" << PROGRAM_FILE << "\"" << std::endl;
-            return EXIT_FAILURE;
+            std::cerr << "Couldn't create a buffer" << std::endl;
+            exit(EXIT_FAILURE);
         }
 
-        std::string programBuffer((std::istreambuf_iterator<char>(programFile)), std::istreambuf_iterator<char>());
-        programFile.close();
+        /* Create a sub-buffer */
+        size_t alignment = 0;              // Adjust this according to device requirements if needed
+        size_t origin = 5 * sizeof(float); // Example origin
+        size_t size = 30 * sizeof(float);  // Example size
 
-        // Create an OpenCL program from the source code
-        cl::Program::Sources sources(1, std::make_pair(programBuffer.c_str(), programBuffer.length() + 1));
-        cl::Program program(context, sources);
-        // Build the OpenCL program
-        if (program.build({device}) != CL_SUCCESS)
+        // Adjust origin to meet alignment requirements if necessary
+        if (origin % alignment != 0)
         {
-            std::cerr << "Error building: " << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device) << std::endl;
-            return EXIT_FAILURE;
+            origin += alignment - (origin % alignment);
         }
 
-        std::cout << "OpenCL program built successfully!" << std::endl;
-
-        // Create kernels
-        std::vector<cl::Kernel> kernels;
-        program.createKernels(&kernels);
-        if (kernels.empty())
+        // Check if size exceeds the parent buffer's size
+        if (origin + size > sizeof(main_data))
         {
-            std::cerr << "Couldn't find any kernels" << std::endl;
-            return EXIT_FAILURE;
+            std::cerr << "Error: Sub-buffer size exceeds parent buffer size" << std::endl;
+            exit(EXIT_FAILURE);
         }
 
-        // Print kernel function names
-        std::string functionName = kernels.front().getInfo<CL_KERNEL_FUNCTION_NAME>();
-        std::cout << "Kernel name: " << functionName << std::endl;
+        cl_buffer_region region = {.origin = origin, .size = size};
+        cl::Buffer sub_buffer = main_buffer.createSubBuffer(CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &region, &err);
+        if (err != CL_SUCCESS)
+        {
+            std::cerr << "Couldn't create a sub-buffer, code: " << err << std::endl;
+            exit(EXIT_FAILURE);
+        }
 
-        // Create command queue
-        cl::CommandQueue queue(context, device);
-#if defined(CL_VERSION_3_x)
-        // Determine global and local sizes
-        size_t dataSize = 1024;                                                   // Example data size
-        size_t localSize = 64;                                                    // Local work-group size
-        size_t globalSize = ((dataSize + localSize - 1) / localSize) * localSize; // Ensures globalSize is a multiple of localSize
-        if (queue.enqueueNDRangeKernel(kernels.front(), cl::NullRange, cl::NDRange(globalSize), cl::NDRange(localSize)) != CL_SUCCESS)
-        {
-            std::cerr << "Couldn't enqueue the kernel execution command" << std::endl;
-        }
-        else
-        {
-            std::cout << "Function " << functionName << " was enqueued to command queue." << std::endl;
-            queue.finish(); // Ensure the kernel execution completes
-        }
-#else
-        if (queue.enqueueTask(kernels.front()) != CL_SUCCESS)
-        {
-            std::cerr << "Couldn't enqueue the kernel execution command" << std::endl;
-        }
-        else
-        {
-            std::cout << "Function " << functionName << " was enqueued to command queue." << std::endl;
-            queue.finish(); // Ensure the kernel execution completes
-        }
-#endif
+        /* Obtain size information about the buffers */
+        std::cout << "Main buffer size: " << main_buffer.getInfo<CL_MEM_SIZE>() << std::endl;
+        std::cout << "Sub-buffer size: " << sub_buffer.getInfo<CL_MEM_SIZE>() << std::endl;
+
+        /* Obtain the host pointers */
+        std::cout << "Main buffer memory address: " << main_buffer.getInfo<CL_MEM_HOST_PTR>() << std::endl;
+        std::cout << "Sub-buffer memory address: " << sub_buffer.getInfo<CL_MEM_HOST_PTR>() << std::endl;
+
+        /* Print the address of the main data */
+        std::cout << std::hex << "Main array address: " << main_data << std::endl;
     }
     catch (cl::Error &e)
     {

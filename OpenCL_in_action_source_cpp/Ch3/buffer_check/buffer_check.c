@@ -56,6 +56,16 @@ cl_device_id create_device()
     clGetDeviceInfo(device, CL_DEVICE_NAME, 100, device_name, NULL);
     printf("Device: %s\n", device_name);
 
+    // Determine OpenCL version
+    char version_str[128];
+    clGetDeviceInfo(device, CL_DEVICE_VERSION, sizeof(version_str), version_str, NULL);
+    int major_version = 1; // default to OpenCL 1.x
+    int minor_version = 2;
+    if (sscanf(version_str, "OpenCL %d.%d", &major_version, &minor_version) == 2)
+    {
+        printf("OpenCL version: %d.%d\n", major_version, minor_version);
+    }
+
     return device;
 }
 
@@ -161,73 +171,65 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    cl_program program = build_program(&context, &device, PROGRAM_FILE);
+    /* Example main data array */
+    float main_data[100]; // Example: array of 100 floats
 
-    cl_kernel kernel;
-    kernel = clCreateKernel(program, KERNEL_NAME, &err);
+    /* Create a buffer to hold 100 floating-point values */
+    cl_mem main_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(main_data), main_data, &err);
     if (err != CL_SUCCESS)
     {
-        perror("Couldn't find any kernels\n");
-        clReleaseProgram(program);
-        clReleaseContext(context);
+        perror("Couldn't create a buffer\n");
         exit(EXIT_FAILURE);
     }
 
-    // Determine OpenCL version
-    char version_str[128];
-    clGetDeviceInfo(device, CL_DEVICE_VERSION, sizeof(version_str), version_str, NULL);
-    int major_version = 1; // default to OpenCL 1.x
-    int minor_version = 2;
-    if (sscanf(version_str, "OpenCL %d.%d", &major_version, &minor_version) == 2)
+    /* Create a sub-buffer */
+    size_t alignment = 0;              // Adjust this according to device requirements if needed
+    size_t origin = 5 * sizeof(float); // Example origin
+    size_t size = 30 * sizeof(float);  // Example size
+
+    // Adjust origin to meet alignment requirements if necessary
+    if (origin % alignment != 0)
     {
-        printf("OpenCL version: %d.%d\n", major_version, minor_version);
+        origin += alignment - (origin % alignment);
     }
 
-    // Create a command queue based on the OpenCL version
-    cl_command_queue queue;
-#if defined(CL_VERSION_2_x) || defined(CL_VERSION_3_x)
-    cl_queue_properties properties[] = {CL_QUEUE_PROPERTIES, 0, 0};
-    queue = clCreateCommandQueueWithProperties(context, device, properties, &err);
-
-#else
-    queue = clCreateCommandQueue(context, device, 0, &err);
-#endif
-
-    if (err < 0)
+    // Check if size exceeds the parent buffer's size
+    if (origin + size > sizeof(main_data))
     {
-        perror("Couldn't create the command queue\n");
+        printf("Error: Sub-buffer size exceeds parent buffer size\n");
         exit(EXIT_FAILURE);
     }
 
-    char fn_name[100];
-    clGetKernelInfo(kernel, CL_KERNEL_FUNCTION_NAME, sizeof(fn_name), fn_name, NULL);
-    printf("Kernel %s.\n", fn_name);
-
-    err = clEnqueueTask(queue, kernel, 0, NULL, NULL); // clEnqueueTask is deprecated
-    // clEnqueueNDRangeKernel(queue, kernel, )
+    cl_buffer_region region = {.origin = origin, .size = size};
+    cl_mem sub_buffer = clCreateSubBuffer(main_buffer, CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &region, &err);
     if (err != CL_SUCCESS)
     {
-        perror("Couldn't enqueue the kernel execution command\n");
-        clReleaseCommandQueue(queue);
-        clReleaseKernel(kernel);
-        clReleaseProgram(program);
-        clReleaseContext(context);
+        perror("Couldn't create a sub-buffer");
+        printf("\n\t%i\n", err);
         exit(EXIT_FAILURE);
     }
-    else
-    {
-        char fn_name[100];
-        clGetKernelInfo(kernel, CL_KERNEL_FUNCTION_NAME, sizeof(fn_name), fn_name, NULL);
-        printf("Function %s was enqueued to command queue.\n", KERNEL_NAME);
-    }
 
-    clReleaseCommandQueue(queue);
+    /* Obtain size information about the buffers */
+    size_t main_buffer_size, sub_buffer_size;
+    clGetMemObjectInfo(main_buffer, CL_MEM_SIZE, sizeof(main_buffer_size), &main_buffer_size, NULL);
+    clGetMemObjectInfo(sub_buffer, CL_MEM_SIZE, sizeof(sub_buffer_size), &sub_buffer_size, NULL);
+    printf("Main buffer size: %lu\n", main_buffer_size);
+    printf("Sub-buffer size:  %lu\n", sub_buffer_size);
 
-    // Release kernels
-    clReleaseKernel(kernel);
+    /* Obtain the host pointers */
+    size_t main_buffer_mem, sub_buffer_mem;
+    clGetMemObjectInfo(main_buffer, CL_MEM_HOST_PTR, sizeof(main_buffer_mem), &main_buffer_mem, NULL);
+    clGetMemObjectInfo(sub_buffer, CL_MEM_HOST_PTR, sizeof(sub_buffer_mem), &sub_buffer_mem, NULL);
+    printf("Main buffer memory address: %p\n", main_buffer_mem);
+    printf("Sub-buffer memory address:  %p\n", sub_buffer_mem);
 
-    // Release OpenCL program and context
-    clReleaseProgram(program);
+    /* Print the address of the main data */
+    printf("Main array address: %p\n", main_data);
+
+    /* Deallocate resources */
+    clReleaseMemObject(main_buffer);
+    clReleaseMemObject(sub_buffer);
     clReleaseContext(context);
+
     return EXIT_SUCCESS;
 }
