@@ -20,11 +20,16 @@ if(APPLE)
     set(LIB ${LIB} "-framework OpenCL")
 else() # GPU NVIDIA
     # Include directories (add as needed)
-    set(INC ${INC} /usr/local/cuda/include)
+    set(CUDA_TOOLKIT_ROOT_DIR /usr/local/cuda)
+    set(CUDA_INCLUDE_DIRS ${CUDA_TOOLKIT_ROOT_DIR}/include)
+    set(CUDA_LIB_DIRS ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
+    # Include directories for non-macOS
+    include_directories(${CUDA_INCLUDE_DIRS})
     # Link directories for non-macOS
-    link_directories(/usr/local/cuda/lib64)
-    # Link the OpenCL library for non-macOS
-    set(LIB ${LIB} OpenCL)
+    link_directories(${CUDA_LIB_DIRS})
+    # Find the OpenCL library for non-macOS
+    find_library(OpenCL_LIBRARY OpenCL PATHS ${CUDA_LIB_DIRS})
+    set(LIB ${OpenCL_LIBRARY})
 endif()
 
 # Include directories (add as needed)
