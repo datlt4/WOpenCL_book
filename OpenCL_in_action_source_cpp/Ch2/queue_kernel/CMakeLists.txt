@@ -25,6 +25,8 @@ else() # GPU NVIDIA
     link_directories(/usr/local/cuda/lib64)
     # Link the OpenCL library for non-macOS
     set(LIB ${LIB} OpenCL)
+    # Define the CL_VERSION_2_x macro to indicate OpenCL 2.x support
+    add_definitions(-DCL_VERSION_2_x)
 endif()
 
 # Include directories (add as needed)

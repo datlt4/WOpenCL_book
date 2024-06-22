@@ -154,8 +154,26 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
+    // Determine OpenCL version
+    char version_str[128];
+    clGetDeviceInfo(device, CL_DEVICE_VERSION, sizeof(version_str), version_str, NULL);
+    int major_version = 1; // default to OpenCL 1.x
+    int minor_version = 2;
+    if (sscanf(version_str, "OpenCL %d.%d", &major_version, &minor_version) == 2)
+    {
+        printf("OpenCL version: %d.%d\n", major_version, minor_version);
+    }
+
+    // Create a command queue based on the OpenCL version
     cl_command_queue queue;
-    queue = clCreateCommandQueue(context, device, 0, &err); // clCreateCommandQueue is deprecated
+#if defined(CL_VERSION_2_x) || defined(CL_VERSION_3_x)
+    cl_queue_properties properties[] = {CL_QUEUE_PROPERTIES, 0, 0};
+    queue = clCreateCommandQueueWithProperties(context, device, properties, &err);
+
+#else
+    queue = clCreateCommandQueue(context, device, 0, &err);
+#endif
+
     if (err < 0)
     {
         perror("Couldn't create the command queue\n");
@@ -167,6 +185,7 @@ int main(int argc, char **argv)
     printf("Kernel %s.\n", fn_name);
 
     err = clEnqueueTask(queue, kernel, 0, NULL, NULL); // clEnqueueTask is deprecated
+    // clEnqueueNDRangeKernel(queue, kernel, )
     if (err != CL_SUCCESS)
     {
         perror("Couldn't enqueue the kernel execution command\n");
