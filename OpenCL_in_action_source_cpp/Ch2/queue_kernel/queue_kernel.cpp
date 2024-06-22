@@ -77,17 +77,18 @@ int main(int argc, char **argv)
         // Create an OpenCL program from the source code
         cl::Program::Sources sources(1, std::make_pair(programBuffer.c_str(), programBuffer.length() + 1));
         cl::Program program(context, sources);
-
         // Build the OpenCL program
-        const char options[] = "-cl-finite-math-only -cl-no-signed-zeros";
-        program.build({device}, options);
+        if (program.build({device}) != CL_SUCCESS)
+        {
+            std::cerr << "Error building: " << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device) << std::endl;
+            return EXIT_FAILURE;
+        }
 
         std::cout << "OpenCL program built successfully!" << std::endl;
 
-        // Determine the number of kernels in the program
+        // Create kernels
         std::vector<cl::Kernel> kernels;
         program.createKernels(&kernels);
-
         if (kernels.empty())
         {
             std::cerr << "Couldn't find any kernels" << std::endl;
@@ -98,14 +99,16 @@ int main(int argc, char **argv)
         std::string functionName = kernels.front().getInfo<CL_KERNEL_FUNCTION_NAME>();
         std::cout << "Kernel name: " << functionName << std::endl;
 
-        cl::CommandQueue queue(context, device, 0);
-        if (!queue.enqueueTask(kernels.front()))
+        // Create command queue
+        cl::CommandQueue queue(context, device);
+        if (queue.enqueueTask(kernels.front()) != CL_SUCCESS)
         {
             std::cerr << "Couldn't enqueue the kernel execution command" << std::endl;
         }
         else
         {
             std::cout << "Function " << functionName << " was enqueued to command queue." << std::endl;
+            queue.finish(); // Ensure the kernel execution completes
         }
     }
     catch (cl::Error &e)
