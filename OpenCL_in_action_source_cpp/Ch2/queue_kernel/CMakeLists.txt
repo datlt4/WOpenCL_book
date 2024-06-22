@@ -30,12 +30,17 @@ else() # GPU NVIDIA
     # Find the OpenCL library for non-macOS
     find_library(OpenCL_LIBRARY OpenCL PATHS ${CUDA_LIB_DIRS})
     set(LIB ${OpenCL_LIBRARY})
-    if(IS_ARMV8)
+    # Detect architecture
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
         # Define the CL_VERSION_2_x macro to indicate OpenCL 2.x support
         add_definitions(-DCL_VERSION_2_x)
-    elseif(IS_X64)
+        message(STATUS "Architecture is ARMv8, define CL_VERSION_2_x")
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|amd64")
         # Define the CL_VERSION_3_x macro to indicate OpenCL 3.x support
         add_definitions(-DCL_VERSION_3_x)
+        message(STATUS "Architecture is x64, define CL_VERSION_3_x")
+    else()
+        message(STATUS "Unknown architecture: ${CMAKE_SYSTEM_PROCESSOR}")
     endif()
 endif()
 
@@ -52,3 +57,8 @@ add_executable(${PROJECT_NAME}.c_app ${C_SRC})
 # Link the OpenCL library for the C application
 target_link_libraries(${PROJECT_NAME}.c_app ${LIB})
 
+# Copy each .cl file to the destination directory
+file(GLOB CL_FILES "${CMAKE_SOURCE_DIR}/*.cl")
+foreach(CL_FILE ${CL_FILES})
+    file(COPY ${CL_FILE} DESTINATION ${CMAKE_BINARY_DIR})
+endforeach()
