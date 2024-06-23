@@ -8,6 +8,7 @@
 #include <fstream>   // For file input/output operations
 #include <utility>   // For std::make_pair
 #include <stdexcept> // For std::exception handling
+#include <iomanip>   // Include this header for setw
 
 #ifdef __APPLE__
 #include <OpenCL/cl.hpp> // OpenCL 1.2 for macOS using C++ bindings
@@ -125,9 +126,13 @@ int main(int argc, char **argv)
         CHECK_CL_ERROR(err);
 
         // Enqueue kernel execution
-        queue.enqueueTask(kernel);
-
-        // Read buffer_one back to result_array and print
+#ifdef APPLE
+        CHECK_CL_ERROR(queue.enqueueTask(kernel));
+#else
+        cl::NDRange global_size(100); // Adjust according to your kernel's requirements
+        CHECK_CL_ERROR(queue.enqueueNDRangeKernel(kernel, cl::NullRange, global_size, cl::NullRange, nullptr, nullptr));
+#endif // APPLE
+       // Read buffer_one back to result_array and print
         CHECK_CL_ERROR(queue.enqueueReadBuffer(buffer_one, CL_TRUE, 0, DATA_LEN_BYTES, result_array));
         std::cout << std::endl;
         for (int i = 0; i < 8; ++i)

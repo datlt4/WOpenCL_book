@@ -8,6 +8,7 @@
 #include <fstream>   // For file input/output operations
 #include <utility>   // For std::make_pair
 #include <stdexcept> // For std::exception handling
+#include <iomanip>   // Include this header for setw
 
 #ifdef __APPLE__
 #include <OpenCL/cl.hpp> // OpenCL 1.2 for macOS using C++ bindings
@@ -111,7 +112,12 @@ int main()
 
         cl::CommandQueue queue(context, device);
 
-        queue.enqueueTask(kernel);
+#ifdef APPLE
+        CHECK_CL_ERROR(queue.enqueueTask(kernel));
+#else
+        cl::NDRange global_size(100); // Adjust according to your kernel's requirements
+        CHECK_CL_ERROR(queue.enqueueNDRangeKernel(kernel, cl::NullRange, global_size, cl::NullRange, nullptr, nullptr));
+#endif // APPLE
         queue.enqueueWriteBuffer(full_buffer, CL_TRUE, 0, sizeof(full_data), full_data);
 
         cl::size_t<3> buffer_origin; // The (x in bytes, y in rows, z in slices) offset in the memory region associated with `buffer`
