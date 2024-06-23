@@ -110,8 +110,8 @@ int main()
 
         kernel.setArg(0, full_buffer);
 
-        cl::CommandQueue queue(context, device);
-
+        cl::CommandQueue queue(context, device, 0, &err);
+        CHECK_CL_ERROR(err);
 #ifdef APPLE
         CHECK_CL_ERROR(queue.enqueueTask(kernel));
 #else

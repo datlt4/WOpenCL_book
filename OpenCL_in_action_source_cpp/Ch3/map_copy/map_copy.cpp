@@ -122,7 +122,7 @@ int main(int argc, char **argv)
         kernel.setArg(1, buffer_two);
 
         // Create command queue
-        cl::CommandQueue queue(context, 0, &err);
+        cl::CommandQueue queue(context, device, 0, &err);
         CHECK_CL_ERROR(err);
 
         // Enqueue kernel execution
