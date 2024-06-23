@@ -17,6 +17,8 @@
 
 #define PROGRAM_FILE "blank.cl"
 #define KERNEL_NAME "blank"
+#define FLOAT_SIZE sizeof(float)
+#define DATA_LEN_BYTES 100 * FLOAT_SIZE
 
 // Helper function to check OpenCL error codes
 #define CHECK_CL_ERROR(err)                                                                    \
@@ -113,18 +115,18 @@ int main()
         queue.enqueueWriteBuffer(full_buffer, CL_TRUE, 0, sizeof(full_data), full_data);
 
         cl::size_t<3> buffer_origin; // The (x in bytes, y in rows, z in slices) offset in the memory region associated with `buffer`
-        buffer_origin[0] = 5 * sizeof(float);
+        buffer_origin[0] = 5 * FLOAT_SIZE;
         buffer_origin[1] = 3;
         buffer_origin[2] = 0;
         cl::size_t<3> host_origin; // The (x in bytes, y in rows, z in slices) offset in the memory region pointed to by `ptr`.
-        host_origin[0] = 1 * sizeof(float);
+        host_origin[0] = 1 * FLOAT_SIZE;
         host_origin[1] = 1;
         host_origin[2] = 0;
         cl::size_t<3> region; // The (width in bytes, height in rows, depth in slices) of the 2D or 3D rectangle.
-        region[0] = 4 * sizeof(float);
+        region[0] = 4 * FLOAT_SIZE;
         region[1] = 4;
         region[2] = 1;
-        queue.enqueueReadBufferRect(full_buffer, CL_TRUE, buffer_origin, host_origin, region, 10 * sizeof(float), 0, 10 * sizeof(float), 0, zero_data);
+        queue.enqueueReadBufferRect(full_buffer, CL_TRUE, buffer_origin, host_origin, region, 10 * FLOAT_SIZE, 0, 10 * FLOAT_SIZE, 0, zero_data);
 
         for (int i = 0; i < 8; ++i)
         {
