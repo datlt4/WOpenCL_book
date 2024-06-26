@@ -430,7 +430,9 @@ clean:
 
 - Tuy các devices không thể được đặt ở cùng một context, nhưng `host` vẫn có thể sử dụng nhiều context trong quá trình làm việc. Ứng dụng host có thể gửi các kernels và các lệnh tới các devices ở 2 platforms khác nhau nhưng các devices không thể chia sẻ tài nguyên liên kết giữa các contexts.
 
-[<img src= "images/F2_1.png" width=522 alignment="center">]()
+<p align="center">
+   [<img src= "images/F2_1.png" width=522 alignment="center">]()
+</p>
 
 ### 2.4.1. Creating contexts
 
@@ -647,7 +649,9 @@ clean:
 
 - `Program` được biểu diễn bằng `cl_program`.
 
-[<img src= "images/F2_2.png" width="522">]()
+<p align="center">
+   [<img src= "images/F2_2.png" width="522">]()
+</p>
 
 ### 2.5.1. Creating programs
 

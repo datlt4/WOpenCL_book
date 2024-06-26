@@ -276,6 +276,19 @@ ushort8 shorts = (ushort8)(0, 10, 20, 30, 40, 50, 60, 70);
 
 ### 4.5.1 Device model analogy part 1: math students in school
 
+- In OpenCL, the device model is structured similarly to a school environment where:
+
+    - **Classes and Classrooms**: Classes represent groups of students working on the same problem (similar to work-groups in OpenCL), while classrooms are where individual students (work-items) perform computations.
+    - **Students and Notebooks**: Each student (work-item) has their own notebook (private memory) to perform calculations.
+    - **Blackboards**: Each classroom shares a blackboard (local memory) where students collaborate within the group.
+    - **Central Blackboard**: Represents global memory, where data is shared among all classes (work-groups) but accessed less frequently due to latency.
+
+- The analogy helps in understanding how data is managed and accessed within the OpenCL device model, emphasizing the distinctions between different levels of memory and the synchronization required between them.
+
+<p align="center">
+  <img src= "images/F4_6.jpg" width="522"/>
+</p>
+
 ### 4.5.2 Device model analogy part 2: work-items in a device
 
 - `OpenCL device` xác định 4 `address spaces`:
@@ -296,6 +309,10 @@ ushort8 shorts = (ushort8)(0, 10, 20, 30, 40, 50, 60, 70);
 - Mỗi `work-item` có quyền truy cập độc quyền tới một `private memory` của nó, và tốc độ nó truy cập vào `private memory` nhanh hơn các bộ nhớ khác rất nhiều. Nhưng kích thước vùng nhớ nhỏ hơn rất nhiều, nên không sử dùng nhiều.
 
 - Để xác định kích thước của các `memory spaces`, gọi hàm `clGetDeviceInfo` với `CL_DEVICE_GLOBAL_MEM_SIZE`, `CL_DEVICE_GLOBAL_MEM_CACHE_SIZE`, `CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE`, hoặc `CL_DEVICE_LOCAL_MEM_SIZE`.
+
+<p align="center">
+  <img src= "images/F4_7.jpg" width="522"/>
+</p>
 
 ### 4.5.3 Address spaces in code
 
