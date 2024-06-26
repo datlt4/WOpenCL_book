@@ -29,6 +29,8 @@ clSetKernelArg(proc, 1, sizeof(mem_obj), &mem_obj);
 
 - Trong OpenCL, `memory objects` được biểu diễn bằng structure `cl_mem`, và chúng được chia thành 2 loại: `buffer objects` và `image objects`. Nếu `Memory objects` để lưu pixel data -> sử dụng `image objects`. Còn trong các trường hợp khác, ta nên lưu data trong `buffer objects`.
 
+
+
 ## 3.2 Buffer objects
 
 - `Buffer objects` có thể gói bất kỳ loại dữ liệu nào mà không liên quan tới images. Khởi tạo bằng hàm `clCreateBuffer`:
@@ -40,14 +42,14 @@ where:
 > `@return`: trả về một `cl_mem`, cái mà chứa data được trỏ bởi `host_ptr *`
 
 <a name="table_memory_object_properties"></a>
-|`cl_mem_flags`|Meaning|
-|:---:|---|
-|`CL_MEM_READ_WRITE`|The memory object can be read from and written to.|
-|`CL_MEM_WRITE_ONLY`|The memory object can only be written to.|
-|`CL_MEM_READ_ONLY`|The memory object can only be read from.|
-|`CL_MEM_USE_HOST_PTR`|The memory object will access the memory region specified by the host pointer.|
-|`CL_MEM_COPY_HOST_PTR`|The memory object will set the memory region specified by the host pointer.|
-|`CL_MEM_ALLOC_HOST_PTR`|A region in host-accessible memory will be allocated for use in data transfer.|
+| Memory Flag            | Description                                                                                              | Use Cases                                                   |
+|------------------------|----------------------------------------------------------------------------------------------------------|-------------------------------------------------------------|
+| `CL_MEM_READ_WRITE`    | Memory object is readable and writable by a kernel.                                                      | General-purpose buffers where both read and write are needed.|
+| `CL_MEM_WRITE_ONLY`    | Memory object is writable but not readable by a kernel.                                                  | Buffers where only write access is required for optimization.|
+| `CL_MEM_READ_ONLY`     | Memory object is readable but not writable by a kernel.                                                  | Buffers containing constant data for kernels.               |
+| `CL_MEM_USE_HOST_PTR`  | Uses the provided host pointer for the memory object, reducing memory copy overhead.                     | Direct host and device memory sharing for efficient access. |
+| `CL_MEM_COPY_HOST_PTR` | Initializes the memory object with the contents of the provided host pointer.                            | Initializing device memory with existing host data.         |
+| `CL_MEM_ALLOC_HOST_PTR`| Allocates memory from host-accessible memory, allowing efficient data transfer between host and device.  | Frequent read/write access from the host.                   |
 
 - Ba properties đầu tiên xác định khả năng truy cập của `buffer object` - rằng buộc khả năng `devices` truy cập vào `buffer object`, không phải `host`.
 
@@ -116,6 +118,8 @@ sub_buffer = clCreateSubBuffer(main_buffer, CL_MEM_READ_ONLY, CL_BUFFER_CREATE_T
 ```
 
 - `subbuffer` không allocate vùng nhớ riêng của nó để giữ data. Thay vào đó, nó truy cập vào cùng vùng nhớ của `main buffer`. Không cần thêm cờ `CL_MEM_COPY_HOST_PTR`.
+
+[<img src= "images/F3_1.png" width="422">]()
 
 ## 3.3 Image objects
 

@@ -64,12 +64,42 @@ xcode-select --install
 brew install llvm
 export CPATH="$(brew --prefix llvm)/lib/clang/$(ls "$(brew --prefix llvm)/lib/clang")/include:$CPATH"
 
-cd /Library/Developer/CommandLineTools/SDKs/MacOSX13.sdk/System/Library/Frameworks/OpenCL.framework/Headers
-sudo curl https://raw.githubusercontent.com/KhronosGroup/OpenCL-CLHPP/main/include/CL/opencl.hpp -o opencl.hpp
-sudo curl https://raw.githubusercontent.com/KhronosGroup/OpenCL-CLHPP/main/include/CL/cl2.hpp -o cl2.hpp
+cd /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks/OpenCL.framework/Versions/A/Headers
+sudo wget https://raw.githubusercontent.com/crosswalk-project/khronos-cl-api-1.2/master/cl.hpp
+
+cd /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenCL.framework/Headers
+sudo wget https://raw.githubusercontent.com/crosswalk-project/khronos-cl-api-1.2/master/cl.hpp
 
 g++ -std=c++11 demo.cc -o demo.bin -framework OpenCL -DAPPLE
 ```
+
+<details>
+  <summary>c_cpp_properties.json</summary>
+
+```json
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks/OpenCL.framework/Versions/A/Headers"
+            ],
+            "defines": [],
+            "macFrameworkPath": [
+                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks"
+            ],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "macos-clang-x64"
+        }
+    ],
+    "version": 4
+}
+```
+
+</details>
 
 ## On Jetson
 

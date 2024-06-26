@@ -4,7 +4,7 @@ CC=gcc
 CFLAGS=-std=c11
 
 # Project names
-PROJ=getInfo
+PROJ=program_build
 PROJ_CPP=$(PROJ).cpp_app
 PROJ_C=$(PROJ).c_app
 

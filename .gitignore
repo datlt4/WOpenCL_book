@@ -1,4 +1,5 @@
 .DS_Store
+.vscode
 
 # Compiled object files
 *.o
@@ -30,6 +31,8 @@
 *.exe
 *.out
 *.app
+*.c_app
+*.cpp_app
 *.i*86
 *.x86_64
 *.hex
@@ -50,10 +53,10 @@
 *.smod
 
 # CMake and build directories
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
+buidl/CMakeFiles/
+buidl/CMakeCache.txt
+buidl/cmake_install.cmake
+buidl/Makefile
 CMakeLists.txt.user
 build/
 Debug/

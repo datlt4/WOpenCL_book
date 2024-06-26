@@ -4,12 +4,15 @@ CC=gcc
 CFLAGS=-std=c11
 
 # Project names
-PROJ=getInfo
+PROJ=queue_kernel
 PROJ_CPP=$(PROJ).cpp_app
 PROJ_C=$(PROJ).c_app
 
 # Detect OS
 UNAME_S := $(shell uname -s)
+
+# Architecture detection
+ARCH := $(shell uname -m)
 
 # Include and library directories and libraries
 ifeq ($(UNAME_S), Linux)
@@ -17,7 +20,11 @@ ifeq ($(UNAME_S), Linux)
     INC_DIRS=-I /usr/local/cuda/include
     LIB_DIRS=-L /usr/local/cuda/lib64
     LIBS=-lOpenCL
-    DEFINES=
+    ifeq ($(ARCH), aarch64)
+        DEFINES=-DCL_VERSION_2_x
+    else ifeq ($(ARCH), x86_64)
+        DEFINES=-DCL_VERSION_3_x
+    endif
 else ifeq ($(UNAME_S), Darwin)
     CXXFLAGS=-std=c++20
     INC_DIRS=
