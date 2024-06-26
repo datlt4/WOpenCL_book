@@ -81,6 +81,45 @@ __kernel void hello_kernel(__global char16 *msg)
 
 ### 4.3.4 Checking IEEE-754 compliance
 
+
+- These constants are part of the OpenCL API and are used to describe the floating-point capabilities of an OpenCL device. They are flags that can be returned by querying the `CL_DEVICE_SINGLE_FP_CONFIG` or `CL_DEVICE_DOUBLE_FP_CONFIG` device information parameters. Here is what each constant represents:
+
+1. `CL_FP_INF_NAN`
+
+    - **Description**: This flag indicates that the device supports the IEEE 754 standard for representing infinity (INF) and "Not a Number" (NaN) values.
+    - **Usage**: It's important for applications that need to handle special floating-point values like overflow results (infinity) or undefined operations (NaN).
+
+2. `CL_FP_DENORM`
+
+    - **Description**: This flag indicates that the device supports denormalized numbers. Denormals are very small numbers that are represented with less precision than normal floating-point numbers.
+    - **Usage**: This is crucial for scientific computations and numerical analysis where very small values need to be represented accurately.
+
+3. `CL_FP_ROUND_TO_NEAREST`
+
+    - **Description**: This flag indicates that the device supports rounding to the nearest even number, which is the default rounding mode in the IEEE 754 standard.
+    - **Usage**: This is the most commonly used rounding mode in floating-point arithmetic to minimize rounding errors.
+
+4. `CL_FP_ROUND_TO_INF`
+
+    - **Description**: This flag indicates that the device supports rounding towards positive infinity (up) and negative infinity (down).
+    - **Usage**: This mode is useful in interval arithmetic and certain mathematical algorithms that need to handle direction-specific rounding.
+
+5. `CL_FP_ROUND_TO_ZERO`
+
+    - **Description**: This flag indicates that the device supports rounding towards zero, also known as truncation.
+    - **Usage**: This mode is used in scenarios where truncation is required, such as in some financial calculations or digital signal processing.
+
+6. `CL_FP_FMA`
+
+    - **Description**: This flag indicates that the device supports fused multiply-add (FMA) operations. An FMA operation computes the product of two numbers and adds a third number to the result in a single step, reducing rounding errors.
+    - **Usage**: FMA is used to improve the accuracy and performance of numerical computations by combining multiplication and addition in a single, highly precise operation.
+
+7. `CL_FP_SOFT_FLOAT`
+
+    - **Description**: This flag indicates that the device implements floating-point operations in software rather than hardware. This is typically slower but ensures support for floating-point operations on devices without native hardware support.
+    - **Usage**: This is used on devices that lack hardware floating-point units but still need to support floating-point arithmetic, such as some embedded systems or older GPUs.
+
+
 ## 4.4 Vector data types
 
 |Vector data type|Purpose|
