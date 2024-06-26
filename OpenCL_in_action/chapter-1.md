@@ -27,7 +27,9 @@
     - kernels
     - command queues
 
-[<img src= "images/F1_1.png" width="522">]()
+<p align="center">
+  [<img src= "images/F1_1.png" width="522">]()
+</p>
 
 OpenCL (Open Computing Language) is a framework for writing programs that execute across heterogeneous platforms, which can include CPUs, GPUs, DSPs, and other processors. To manage and execute these programs, OpenCL provides a set of data structures. Here is a detailed explanation of each of these data structures:
 

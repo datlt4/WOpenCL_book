@@ -118,8 +118,8 @@ sub_buffer = clCreateSubBuffer(main_buffer, CL_MEM_READ_ONLY, CL_BUFFER_CREATE_T
 ```
 
 - `subbuffer` không allocate vùng nhớ riêng của nó để giữ data. Thay vào đó, nó truy cập vào cùng vùng nhớ của `main buffer`. Không cần thêm cờ `CL_MEM_COPY_HOST_PTR`.
-
-[<img src= "images/F3_1.png" width="422">]()
+<p align="center">
+[<img src= "images/F3_1.png" width="422">]()</p>
 
 ## 3.3 Image objects
 
@@ -197,7 +197,9 @@ rgb_format.image_channel_data_type = CL_UNSIGNED_INT8;
 - "If row_pitch is set to 0, OpenCL will assume its value equals width * (pixel size). If slice_pitch is set to 0, its value will be set to row_pitch * height. In this book's example code, row_pitch and slice_pitch will always be set to 0." (_cited: [OpenCL in Action How to Accelerate Graphics and Computations](https://www.manning.com/books/opencl-in-action) - Chapter 3 Host programming: data transfer and partitioning._
 )
 
+<p align="center">
 [<img src= "images/F3_2.png" width="522">]()
+</p>
 
 - Example code: tạo một ảnh 3-d chứa 4 slices, mỗi slice có kích thước `64x80` pixels, định dạng màu `rgb`, đây là một `read-only image object`. Trong trường hợp set cờ `CL_MEM_WRITE_ONLY`, `object data` bằng `NULL`.
 
@@ -461,7 +463,9 @@ clean:
 
 - Trong từng hàm trên, hai argument quan trọng gồm: tham số `cl_mem` - xác định `memory objects` trên `device`, và `void` pointer tham chiếu tới `host memory`. Tham số boolean `blocking = CL_TRUE`, hàm sẽ không return nếu quá trình `read/write` chưa kết thúc. Còn nếu `blocking = CL_FALSE`, hàm sẽ enqueue lệnh `read/write` nhưng sẽ không chờ quá trình data transfer kết thúc. Các tham số còn lại xác định phần nào của `memory object` có thể được truy cập. `offset`: điểm bắt đầu của `buffer data` để `read/write`. `data_size`: số lượng dữ liệu tính từ `offset` cần được truyền.
 
+<p align="center">
 [<img src= "images/F3_3.png" width="522">]()
+</p>
 
 - Các hàm `clEnqueueReadImage` và `clEnqueueWriteImage` có thêm 2 tham số là `orgin[3]` và `region[3]`. Hai mảng này xác định vùng hình chữ nhật của `image data` được truyền vào hoặc truyền ra `image object`. Trong đó: `origin[3] = [column, row, slice]` xác định vị trí của tọa độ điểm pixel đầu tiên, `region[3] = [width, height, depth]` xác định kích thước của vùng truy cập. (Đối với ảnh `2-d`: `origin = [column, row, 0]` và `region = [width, height, 0]`)
 
@@ -514,8 +518,10 @@ clean:
 
 - Hình 3.6 là một ví dụ minh hoạ cách map và copy các `memory objects`. Mục đích là tạo ra 2 `buffer objects` và copy nội dung của `Buffer 1` sang `Buffer 2` với `clEnqueueCopyBuffer`. Sau đó `clEnqueueMapBuffer` để map nội dung của `Buffer 2` và `host memory`. Và hàm `memcpy` giúp chuyển `mapped memory` thành một array.
 
-[<img src= "images/F3_6.png" width="522">]()
 
+<p align="center">
+[<img src= "images/F3_6.png" width="522">]()
+</p>
 ## 3.6 Data partitioning
 
 - Khi triển khai một thuật toán với `OpenCL`, ta có thể phải xử lý một lượng lớn data. Điều này khiến việc phân vùng trở nên ưu tiên - vì phân phối `processing load` các tốt thì `computational tasks` càng kết thúc nhanh.
@@ -572,7 +578,9 @@ process(point[i][j][k]);
 
 - Tham số `global_work_size` của hàm `clEnqueueNDRangeKernel` xác định số lượng `work-items` cần được xử lý theo từng chiều. Trong `hình 3.7`, vòng lặp trong cùng chạy từ `k=3` đến `k=11`, nên có `9 work-items` trên `k-direction`. Tương tự, có `6 work-items` theo trục `j-direction` và `4 work-items` theo trục `i-direction`. Do đó, ta sẽ đặt `global_work_sizes = {4, 6, 9}`.
 
+<p align="center">
 [<img src= "images/F3_7.png" width="622">]()
+</p>
 
 ### 3.6.3 A simple one-dimensional example
 
@@ -594,7 +602,9 @@ int i = get_global_id(0);
 result[i] = dot(matrix[i], vector[0]);
 ```
 
-[<img src= "images/F3_8.png" width="622">]()
+<p align="center">
+   [<img src= "images/F3_8.png" width="622">]()
+</p>
 
 ### 3.6.4 Work-groups and compute units
 
@@ -610,7 +620,9 @@ result[i] = dot(matrix[i], vector[0]);
 
 - Ta không cần phải tạo `work-group`. Nếu đặt `local_work_size=NULL`, `OpenCL` sẽ quyết định cách tốt nhất để phân phối các `work-items` giữa các `processing elements` của thiết bị.
 
+<p align="center">
 [<img src= "images/F3_9.png" width="622">]()
+</p>
 
 ## 3.7 Summary
 
