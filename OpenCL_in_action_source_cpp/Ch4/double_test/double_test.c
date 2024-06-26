@@ -75,7 +75,7 @@ cl_device_id create_device()
 cl_program build_program(const cl_context *context, const cl_device_id *device, const char *filename)
 {
     cl_int err;
-    const char options[100] = "-cl-finite-math-only -cl-no-signed-zeros";
+    char options[100] = "-cl-finite-math-only -cl-no-signed-zeros";
 
     size_t len_extensions;
     char *extensions;
