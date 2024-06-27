@@ -209,7 +209,7 @@ clean:
     - [3.6.4 Work-groups and compute units](OpenCL_in_action/chapter-3.md#364-work-groups-and-compute-units)
 - [3.7 Summary](OpenCL_in_action/chapter-3.md#37-summary)
 
-## Chapter 4: Kernel programming: data types and device memory
+## [Chapter 4: Kernel programming: data types and device memory](OpenCL_in_action/chapter-4.md#chapter-4-kernel-programming-data-types-and-device-memory)
 - [4.1 Introducing kernel coding](OpenCL_in_action/chapter-4.md#41-Introducing-kernel-coding)
 - [4.2 Scalar data types](OpenCL_in_action/chapter-4.md#42-Scalar-data-types)
     - [4.2.1 Accessing the double data type](OpenCL_in_action/chapter-4.md#421-Accessing-the-double-data-type)
@@ -234,7 +234,7 @@ clean:
     - [4.6.2 Private arguments](OpenCL_in_action/chapter-4.md#462-Private-arguments)
 - [4.7 Summary](OpenCL_in_action/chapter-4.md#47-Summary)
 
-## Chapter 5: Kernel programming: operators and functions
+## [Chapter 5: Kernel programming: operators and functions](OpenCL_in_action/chapter-5.md#chapter-5-kernel-programming-operators-and-functions)
 - [5.1 Operators](OpenCL_in_action/chapter-5.md#51-operators)
 - [5.2 Work-item and work-group functions](OpenCL_in_action/chapter-5.md#52-work-item-and-work-group-functions)
     - [5.2.1 Dimensions and work-items](OpenCL_in_action/chapter-5.md#521-dimensions-and-work-items)
@@ -261,7 +261,7 @@ clean:
 - [5.8 Geometric functions](OpenCL_in_action/chapter-5.md#58-geometric-functions)
 - [5.9 Summary](OpenCL_in_action/chapter-5.md#59-summary)
 
-## Chapter 6: Image processing
+## [Chapter 6: Image processing](OpenCL_in_action/chapter-6.md#61-image-objects-and-samplers)
 - [6.1 Image objects and samplers](OpenCL_in_action/chapter-6.md#61-image-objects-and-samplers)
     - [6.1.1 Image objects on the host: cl_mem](OpenCL_in_action/chapter-6.md#611-image-objects-on-the-host-cl_mem)
     - [6.1.2 Samplers on the host: cl_sampler](OpenCL_in_action/chapter-6.md#612-samplers-on-the-host-cl_sampler)
