@@ -235,48 +235,48 @@ clean:
 - [4.7 Summary](OpenCL_in_action/chapter-4.md#47-Summary)
 
 ## Chapter 5: Kernel programming: operators and functions
-- 5.1 Operators
-- 5.2 Work-item and work-group functions
-    - 5.2.1 Dimensions and work-items
-    - 5.2.2 Work-groups
-    - 5.2.3 An example application
-- 5.3 Data transfer operations
-    - 5.3.1 Loading and storing data of the same type
-    - 5.3.2 Loading vectors from a scalar array
-    - 5.3.3 Storing vectors to a scalar array
-- 5.4 Floating-point functions
-    - 5.4.1 Arithmetic and rounding functions
-    - 5.4.2 Comparison functions
-    - 5.4.3 Exponential and logarithmic functions
-    - 5.4.4 Trigonometric functions
-    - 5.4.5 Miscellaneous floating-point functions
-- 5.5 Integer functions
-    - 5.5.1 Adding and subtracting integers
-    - 5.5.2 Multiplication
-    - 5.5.3 Miscellaneous integer functions
-- 5.6 Shuffle and select functions
-    - 5.6.1 Shuffle functions
-    - 5.6.2 Select functions
-- 5.7 Vector test functions
-- 5.8 Geometric functions
-- 5.9 Summary
+- [5.1 Operators](OpenCL_in_action/chapter-5.md#51-operators)
+- [5.2 Work-item and work-group functions](OpenCL_in_action/chapter-5.md#52-work-item-and-work-group-functions)
+    - [5.2.1 Dimensions and work-items](OpenCL_in_action/chapter-5.md#521-dimensions-and-work-items)
+    - [5.2.2 Work-groups](OpenCL_in_action/chapter-5.md#522-work-groups)
+    - [5.2.3 An example application](OpenCL_in_action/chapter-5.md#523-an-example-application)
+- [5.3 Data transfer operations](OpenCL_in_action/chapter-5.md#53-data-transfer-operations)
+    - [5.3.1 Loading and storing data of the same type](OpenCL_in_action/chapter-5.md#531-loading-and-storing-data-of-the-same-type)
+    - [5.3.2 Loading vectors from a scalar array](OpenCL_in_action/chapter-5.md#532-loading-vectors-from-a-scalar-array)
+    - [5.3.3 Storing vectors to a scalar array](OpenCL_in_action/chapter-5.md#533-storing-vectors-to-a-scalar-array)
+- [5.4 Floating-point functions](OpenCL_in_action/chapter-5.md#54-floating-point-functions)
+    - [5.4.1 Arithmetic and rounding functions](OpenCL_in_action/chapter-5.md#541-arithmetic-and-rounding-functions)
+    - [5.4.2 Comparison functions](OpenCL_in_action/chapter-5.md#542-comparison-functions)
+    - [5.4.3 Exponential and logarithmic functions](OpenCL_in_action/chapter-5.md#543-exponential-and-logarithmic-functions)
+    - [5.4.4 Trigonometric functions](OpenCL_in_action/chapter-5.md#544-trigonometric-functions)
+    - [5.4.5 Miscellaneous floating-point functions](OpenCL_in_action/chapter-5.md#545-miscellaneous-floating-point-functions)
+- [5.5 Integer functions](OpenCL_in_action/chapter-5.md#55-integer-functions)
+    - [5.5.1 Adding and subtracting integers](OpenCL_in_action/chapter-5.md#551-adding-and-subtracting-integers)
+    - [5.5.2 Multiplication](OpenCL_in_action/chapter-5.md#552-multiplication)
+    - [5.5.3 Miscellaneous integer functions](OpenCL_in_action/chapter-5.md#553-miscellaneous-integer-functions)
+- [5.6 Shuffle and select functions](OpenCL_in_action/chapter-5.md#56-shuffle-and-select-functions)
+    - [5.6.1 Shuffle functions](OpenCL_in_action/chapter-5.md#561-shuffle-functions)
+    - [5.6.2 Select functions](OpenCL_in_action/chapter-5.md#562-select-functions)
+- [5.7 Vector test functions](OpenCL_in_action/chapter-5.md#57-vector-test-functions)
+- [5.8 Geometric functions](OpenCL_in_action/chapter-5.md#58-geometric-functions)
+- [5.9 Summary](OpenCL_in_action/chapter-5.md#59-summary)
 
 ## Chapter 6: Image processing
-- 6.1 Image objects and samplers
-    - 6.1.1 Image objects on the host: cl_mem
-    - 6.1.2 Samplers on the host: cl_sampler
-    - 6.1.3 Image objects on the device: image2d_t and image3d_t
-    - 6.1.4 Samplers on the device: sampler_t
-- 6.2 Image processing functions
-    - 6.2.1 Image read functions
-    - 6.2.2 Image write functions
-    - 6.2.3 Image information functions
-    - 6.2.4 A simple example
-- 6.3 Image scaling and interpolation
-    - 6.3.1 Nearest-neighbor interpolation
-    - 6.3.2 Bilinear interpolation
-    - 6.3.3 Image enlargement in OpenCL
-- 6.4 Summary
+- [6.1 Image objects and samplers](OpenCL_in_action/chapter-6.md#61-image-objects-and-samplers)
+    - [6.1.1 Image objects on the host: cl_mem](OpenCL_in_action/chapter-6.md#611-image-objects-on-the-host-cl_mem)
+    - [6.1.2 Samplers on the host: cl_sampler](OpenCL_in_action/chapter-6.md#612-samplers-on-the-host-cl_sampler)
+    - [6.1.3 Image objects on the device: image2d_t and image3d_t](OpenCL_in_action/chapter-6.md#613-image-objects-on-the-device-image2d_t-and-image3d_t)
+    - [6.1.4 Samplers on the device: sampler_t](OpenCL_in_action/chapter-6.md#614-samplers-on-the-device-sampler_t)
+- [6.2 Image processing functions](OpenCL_in_action/chapter-6.md#62-image-processing-functions)
+    - [6.2.1 Image read functions](OpenCL_in_action/chapter-6.md#621-image-read-functions)
+    - [6.2.2 Image write functions](OpenCL_in_action/chapter-6.md#622-image-write-functions)
+    - [6.2.3 Image information functions](OpenCL_in_action/chapter-6.md#623-image-information-functions)
+    - [6.2.4 A simple example](OpenCL_in_action/chapter-6.md#624-a-simple-example)
+- [6.3 Image scaling and interpolation](OpenCL_in_action/chapter-6.md#63-image-scaling-and-interpolation)
+    - [6.3.1 Nearest-neighbor interpolation](OpenCL_in_action/chapter-6.md#631-nearest-neighbor-interpolation)
+    - [6.3.2 Bilinear interpolation](OpenCL_in_action/chapter-6.md#632-bilinear-interpolation)
+    - [6.3.3 Image enlargement in OpenCL](OpenCL_in_action/chapter-6.md#633-image-enlargement-in-opencl)
+- [6.4 Summary](OpenCL_in_action/chapter-6.md#64-summary)
 
 ## Chapter 7: Events, profiling, and synchronization
 - 7.1 Host notification events
