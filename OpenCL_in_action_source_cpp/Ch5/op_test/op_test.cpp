@@ -102,94 +102,96 @@ int main(int argc, char **argv)
 {
     try
     {
-        cl_int err;
+        cl_int err; // Variable to store OpenCL error codes
+
         // Create OpenCL device
-        cl::Device device = create_device();
+        cl::Device device = create_device(); // Function to find and create an OpenCL device
 
-        cl::Context context{device};
-        cl::Program program = build_program(context, device, PROGRAM_FILE);
-        cl::CommandQueue queue{context, device};
+        // Create OpenCL context and program
+        cl::Context context{device};                                        // Create OpenCL context
+        cl::Program program = build_program(context, device, PROGRAM_FILE); // Build the OpenCL program from a file
+        cl::CommandQueue queue{context, device};                            // Create command queue
 
-        cl::Kernel kn_op_test1{program, "op_test1", &err};
-        CHECK_CL_ERROR(err);
-        int vector[4];
-        cl::Buffer vec_buffer1{context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(vector), &err};
+        // Create and set up the first kernel
+        cl::Kernel kn_op_test1{program, "op_test1", &err};                                               // Create kernel from the program
+        CHECK_CL_ERROR(err);                                                                             // Check for errors during kernel creation
+        int vector[4];                                                                                   // Array to hold the results read from the buffer
+        cl::Buffer vec_buffer1{context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(vector), &err}; // Create buffer for the kernel
 
-        kn_op_test1.setArg(0, sizeof(vec_buffer1), &vec_buffer1);
+        kn_op_test1.setArg(0, sizeof(vec_buffer1), &vec_buffer1); // Set buffer as kernel argument
 #ifdef APPLE
-        CHECK_CL_ERROR(queue.enqueueTask(kn_op_test1));
+        CHECK_CL_ERROR(queue.enqueueTask(kn_op_test1)); // Enqueue kernel execution for Apple platform
 #else
-        cl::NDRange global_size(1024); // Adjust according to your kernel's requirements
-        CHECK_CL_ERROR(queue.enqueueNDRangeKernel(kn_op_test1, cl::NullRange, global_size, cl::NullRange, nullptr, nullptr));
-#endif // APPLE
-        memset((void *)vector, 0, sizeof(vector));
-        CHECK_CL_ERROR(queue.enqueueReadBuffer(vec_buffer1, CL_TRUE, 0, 16, vector));
-        std::cout << std::hex << "Ouput: [0]: " << vector[0] << ", [1]: " << vector[1] << ", [2]: " << vector[2] << ", [3]:" << vector[3] << std::endl;
+        cl::NDRange global_size(1024);                                                                                        // Adjust according to your kernel's requirements
+        CHECK_CL_ERROR(queue.enqueueNDRangeKernel(kn_op_test1, cl::NullRange, global_size, cl::NullRange, nullptr, nullptr)); // Enqueue kernel execution for non-Apple platform
+#endif                                                                                                                                                    // APPLE
+        memset((void *)vector, 0, sizeof(vector));                                                                                                        // Clear the vector
+        CHECK_CL_ERROR(queue.enqueueReadBuffer(vec_buffer1, CL_TRUE, 0, 16, vector));                                                                     // Read buffer back to vector
+        std::cout << std::hex << "Output: [0]: " << vector[0] << ", [1]: " << vector[1] << ", [2]: " << vector[2] << ", [3]: " << vector[3] << std::endl; // Print the results
 
-        cl::Kernel kn_op_test2{program, "op_test2", &err};
-        CHECK_CL_ERROR(err);
-        cl::Buffer vec_buffer2{context, CL_MEM_READ_WRITE, sizeof(vector), nullptr, &err};
-        CHECK_CL_ERROR(err);
-        CHECK_CL_ERROR(kn_op_test2.setArg(0, sizeof(vec_buffer2), &vec_buffer2));
-        CHECK_CL_ERROR(queue.enqueueCopyBuffer(vec_buffer1, vec_buffer2, 0, 0, sizeof(vector)));
+        // Create and set up the second kernel
+        cl::Kernel kn_op_test2{program, "op_test2", &err};                                       // Create kernel from the program
+        CHECK_CL_ERROR(err);                                                                     // Check for errors during kernel creation
+        cl::Buffer vec_buffer2{context, CL_MEM_READ_WRITE, sizeof(vector), nullptr, &err};       // Create buffer for the kernel
+        CHECK_CL_ERROR(err);                                                                     // Check for errors during buffer creation
+        CHECK_CL_ERROR(kn_op_test2.setArg(0, sizeof(vec_buffer2), &vec_buffer2));                // Set buffer as kernel argument
+        CHECK_CL_ERROR(queue.enqueueCopyBuffer(vec_buffer1, vec_buffer2, 0, 0, sizeof(vector))); // Copy data from vec_buffer1 to vec_buffer2
 #ifdef APPLE
-        CHECK_CL_ERROR(queue.enqueueTask(kn_op_test2));
+        CHECK_CL_ERROR(queue.enqueueTask(kn_op_test2)); // Enqueue kernel execution for Apple platform
 #else
-        CHECK_CL_ERROR(queue.enqueueNDRangeKernel(kn_op_test2, cl::NullRange, global_size, cl::NullRange, nullptr, nullptr));
-#endif // APPLE
-memset((void *)vector, 0, sizeof(vector));
-queue.enqueueReadBuffer(vec_buffer2, CL_TRUE, 0, sizeof(vector), vector);
-std::cout << std::hex << "Ouput: [0]: " << vector[0] << ", [1]: " << vector[1] << ", [2]: " << vector[2] << ", [3]:" << vector[3] << std::endl;
+        CHECK_CL_ERROR(queue.enqueueNDRangeKernel(kn_op_test2, cl::NullRange, global_size, cl::NullRange, nullptr, nullptr)); // Enqueue kernel execution for non-Apple platform
+#endif                                                                                                                                                    // APPLE
+        memset((void *)vector, 0, sizeof(vector));                                                                                                        // Clear the vector
+        queue.enqueueReadBuffer(vec_buffer2, CL_TRUE, 0, sizeof(vector), vector);                                                                         // Read buffer back to vector
+        std::cout << std::hex << "Output: [0]: " << vector[0] << ", [1]: " << vector[1] << ", [2]: " << vector[2] << ", [3]: " << vector[3] << std::endl; // Print the results
 
-
-      cl::Kernel kn_op_test3{program, "op_test3", &err};
-        CHECK_CL_ERROR(err);
-        cl::Buffer vec_buffer3{context, CL_MEM_READ_WRITE, sizeof(vector), nullptr, &err};
-        CHECK_CL_ERROR(err);
-        CHECK_CL_ERROR(kn_op_test3.setArg(0, sizeof(vec_buffer3), &vec_buffer3));
-        CHECK_CL_ERROR(queue.enqueueCopyBuffer(vec_buffer2, vec_buffer3, 0, 0, sizeof(vector)));
+        // Create and set up the third kernel
+        cl::Kernel kn_op_test3{program, "op_test3", &err};                                       // Create kernel from the program
+        CHECK_CL_ERROR(err);                                                                     // Check for errors during kernel creation
+        cl::Buffer vec_buffer3{context, CL_MEM_READ_WRITE, sizeof(vector), nullptr, &err};       // Create buffer for the kernel
+        CHECK_CL_ERROR(err);                                                                     // Check for errors during buffer creation
+        CHECK_CL_ERROR(kn_op_test3.setArg(0, sizeof(vec_buffer3), &vec_buffer3));                // Set buffer as kernel argument
+        CHECK_CL_ERROR(queue.enqueueCopyBuffer(vec_buffer2, vec_buffer3, 0, 0, sizeof(vector))); // Copy data from vec_buffer2 to vec_buffer3
 #ifdef APPLE
-        CHECK_CL_ERROR(queue.enqueueTask(kn_op_test3));
+        CHECK_CL_ERROR(queue.enqueueTask(kn_op_test3)); // Enqueue kernel execution for Apple platform
 #else
-        CHECK_CL_ERROR(queue.enqueueNDRangeKernel(kn_op_test3, cl::NullRange, global_size, cl::NullRange, nullptr, nullptr));
-#endif // APPLE
-memset((void *)vector, 0, sizeof(vector));
-queue.enqueueReadBuffer(vec_buffer3, CL_TRUE, 0, sizeof(vector), vector);
-std::cout << std::hex << "Ouput: [0]: " << vector[0] << ", [1]: " << vector[1] << ", [2]: " << vector[2] << ", [3]:" << vector[3] << std::endl;
+        CHECK_CL_ERROR(queue.enqueueNDRangeKernel(kn_op_test3, cl::NullRange, global_size, cl::NullRange, nullptr, nullptr)); // Enqueue kernel execution for non-Apple platform
+#endif                                                                                                                                                    // APPLE
+        memset((void *)vector, 0, sizeof(vector));                                                                                                        // Clear the vector
+        queue.enqueueReadBuffer(vec_buffer3, CL_TRUE, 0, sizeof(vector), vector);                                                                         // Read buffer back to vector
+        std::cout << std::hex << "Output: [0]: " << vector[0] << ", [1]: " << vector[1] << ", [2]: " << vector[2] << ", [3]: " << vector[3] << std::endl; // Print the results
 
-
-      cl::Kernel kn_op_test4{program, "op_test4", &err};
-        CHECK_CL_ERROR(err);
-        cl::Buffer vec_buffer4{context, CL_MEM_READ_WRITE, sizeof(vector), nullptr, &err};
-        CHECK_CL_ERROR(err);
-        CHECK_CL_ERROR(kn_op_test4.setArg(0, sizeof(vec_buffer4), &vec_buffer4));
-        CHECK_CL_ERROR(queue.enqueueCopyBuffer(vec_buffer3, vec_buffer4, 0, 0, sizeof(vector)));
+        // Create and set up the fourth kernel
+        cl::Kernel kn_op_test4{program, "op_test4", &err};                                       // Create kernel from the program
+        CHECK_CL_ERROR(err);                                                                     // Check for errors during kernel creation
+        cl::Buffer vec_buffer4{context, CL_MEM_READ_WRITE, sizeof(vector), nullptr, &err};       // Create buffer for the kernel
+        CHECK_CL_ERROR(err);                                                                     // Check for errors during buffer creation
+        CHECK_CL_ERROR(kn_op_test4.setArg(0, sizeof(vec_buffer4), &vec_buffer4));                // Set buffer as kernel argument
+        CHECK_CL_ERROR(queue.enqueueCopyBuffer(vec_buffer3, vec_buffer4, 0, 0, sizeof(vector))); // Copy data from vec_buffer3 to vec_buffer4
 #ifdef APPLE
-        CHECK_CL_ERROR(queue.enqueueTask(kn_op_test4));
+        CHECK_CL_ERROR(queue.enqueueTask(kn_op_test4)); // Enqueue kernel execution for Apple platform
 #else
-        CHECK_CL_ERROR(queue.enqueueNDRangeKernel(kn_op_test4, cl::NullRange, global_size, cl::NullRange, nullptr, nullptr));
-#endif // APPLE
-memset((void *)vector, 0, sizeof(vector));
-queue.enqueueReadBuffer(vec_buffer4, CL_TRUE, 0, sizeof(vector), vector);
-std::cout << std::hex << "Ouput: [0]: " << vector[0] << ", [1]: " << vector[1] << ", [2]: " << vector[2] << ", [3]:" << vector[3] << std::endl;
-
-
+        CHECK_CL_ERROR(queue.enqueueNDRangeKernel(kn_op_test4, cl::NullRange, global_size, cl::NullRange, nullptr, nullptr)); // Enqueue kernel execution for non-Apple platform
+#endif                                                                                                                                                    // APPLE
+        memset((void *)vector, 0, sizeof(vector));                                                                                                        // Clear the vector
+        queue.enqueueReadBuffer(vec_buffer4, CL_TRUE, 0, sizeof(vector), vector);                                                                         // Read buffer back to vector
+        std::cout << std::hex << "Output: [0]: " << vector[0] << ", [1]: " << vector[1] << ", [2]: " << vector[2] << ", [3]: " << vector[3] << std::endl; // Print the results
     }
     catch (cl::Error &e)
     {
-        std::cerr << "OpenCL error: " << e.what() << " (" << e.err() << ")" << std::endl;
+        std::cerr << "OpenCL error: " << e.what() << " (" << e.err() << ")" << std::endl; // Catch and print OpenCL errors
         return EXIT_FAILURE;
     }
     catch (std::exception &e)
     {
-        std::cerr << "Standard exception: " << e.what() << std::endl;
+        std::cerr << "Standard exception: " << e.what() << std::endl; // Catch and print standard exceptions
         return EXIT_FAILURE;
     }
     catch (...)
     {
-        std::cerr << "Unknown error occurred" << std::endl;
+        std::cerr << "Unknown error occurred" << std::endl; // Catch and print unknown errors
         return EXIT_FAILURE;
     }
 
-    return EXIT_SUCCESS;
+    return EXIT_SUCCESS; // Return success
 }

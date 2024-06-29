@@ -169,6 +169,11 @@ cl_program build_program(const cl_context *context, const cl_device_id *device, 
     return program;
 }
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <CL/cl.h>
+
 int main(int argc, char **argv)
 {
     cl_int err; // Variable to store OpenCL error codes
@@ -182,63 +187,67 @@ int main(int argc, char **argv)
     CHECK_CL_ERROR(err);                                                      // Check for errors during command queue creation
 
     // Array to hold the results read from the buffer
-    int vector[4] = {0};
+    int vector[4] = {0}; // Initialize vector with zeroes
 
-    cl_kernel kn_op_test1 = clCreateKernel(program, "op_test1", &err); // Create kernel from the program
-    CHECK_CL_ERROR(err);                                               // Check for errors during kernel creation
-    cl_mem vec_buffer1 = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(vector), vector, &err);
-    CHECK_CL_ERROR(err); // Check for errors during kernel creation
-    CHECK_CL_ERROR(clSetKernelArg(kn_op_test1, 0, sizeof(cl_mem), &vec_buffer1));
-    CHECK_CL_ERROR(clEnqueueTask(queue, kn_op_test1, 0, NULL, NULL));
-    memset((void*)vector, 0, sizeof(vector));
-    CHECK_CL_ERROR(clEnqueueReadBuffer(queue, vec_buffer1, CL_TRUE, 0, sizeof(vector), vector, 0, NULL, NULL));
-    printf("output: [0]: %d, [1]: %d, [2]: %d, [3]: %d\n", vector[0], vector[1], vector[2], vector[3]);
+    // Create and set up the first kernel
+    cl_kernel kn_op_test1 = clCreateKernel(program, "op_test1", &err);                                                    // Create kernel from the program
+    CHECK_CL_ERROR(err);                                                                                                  // Check for errors during kernel creation
+    cl_mem vec_buffer1 = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(vector), vector, &err); // Create buffer for the kernel
+    CHECK_CL_ERROR(err);                                                                                                  // Check for errors during buffer creation
+    CHECK_CL_ERROR(clSetKernelArg(kn_op_test1, 0, sizeof(cl_mem), &vec_buffer1));                                         // Set buffer as kernel argument
+    CHECK_CL_ERROR(clEnqueueTask(queue, kn_op_test1, 0, NULL, NULL));                                                     // Enqueue kernel execution
+    memset((void *)vector, 0, sizeof(vector));                                                                            // Clear the vector
+    CHECK_CL_ERROR(clEnqueueReadBuffer(queue, vec_buffer1, CL_TRUE, 0, sizeof(vector), vector, 0, NULL, NULL));           // Read buffer back to vector
+    printf("output: [0]: %d, [1]: %d, [2]: %d, [3]: %d\n", vector[0], vector[1], vector[2], vector[3]);                   // Print the results
 
-    cl_kernel kn_op_test2 = clCreateKernel(program, "op_test2", &err); // Create kernel from the program
-    CHECK_CL_ERROR(err);                                               // Check for errors during kernel creation
-    cl_mem vec_buffer2 = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(vector), NULL, &err);
-    CHECK_CL_ERROR(err); // Check for errors during kernel creation
-    CHECK_CL_ERROR(clSetKernelArg(kn_op_test2, 0, sizeof(cl_mem), &vec_buffer2));
-    CHECK_CL_ERROR(clEnqueueCopyBuffer(queue, vec_buffer1, vec_buffer2, 0, 0, sizeof(vector), 0, NULL, NULL));
-    CHECK_CL_ERROR(clEnqueueTask(queue, kn_op_test2, 0, NULL, NULL));
-    memset((void*)vector, 0, sizeof(vector));
-    CHECK_CL_ERROR(clEnqueueReadBuffer(queue, vec_buffer2, CL_TRUE, 0, sizeof(vector), vector, 0, NULL, NULL));
-    printf("output: [0]: %d, [1]: %d, [2]: %d, [3]: %d\n", vector[0], vector[1], vector[2], vector[3]);
+    // Create and set up the second kernel
+    cl_kernel kn_op_test2 = clCreateKernel(program, "op_test2", &err);                                          // Create kernel from the program
+    CHECK_CL_ERROR(err);                                                                                        // Check for errors during kernel creation
+    cl_mem vec_buffer2 = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(vector), NULL, &err);                // Create buffer for the kernel
+    CHECK_CL_ERROR(err);                                                                                        // Check for errors during buffer creation
+    CHECK_CL_ERROR(clSetKernelArg(kn_op_test2, 0, sizeof(cl_mem), &vec_buffer2));                               // Set buffer as kernel argument
+    CHECK_CL_ERROR(clEnqueueCopyBuffer(queue, vec_buffer1, vec_buffer2, 0, 0, sizeof(vector), 0, NULL, NULL));  // Copy data from vec_buffer1 to vec_buffer2
+    CHECK_CL_ERROR(clEnqueueTask(queue, kn_op_test2, 0, NULL, NULL));                                           // Enqueue kernel execution
+    memset((void *)vector, 0, sizeof(vector));                                                                  // Clear the vector
+    CHECK_CL_ERROR(clEnqueueReadBuffer(queue, vec_buffer2, CL_TRUE, 0, sizeof(vector), vector, 0, NULL, NULL)); // Read buffer back to vector
+    printf("output: [0]: %d, [1]: %d, [2]: %d, [3]: %d\n", vector[0], vector[1], vector[2], vector[3]);         // Print the results
 
-    cl_kernel kn_op_test3 = clCreateKernel(program, "op_test3", &err);
-    CHECK_CL_ERROR(err);
-    cl_mem vec_buffer3 = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(vector), NULL, &err);
-    CHECK_CL_ERROR(err);
-    CHECK_CL_ERROR(clSetKernelArg(kn_op_test3, 0, sizeof(cl_mem), &vec_buffer3));
-    CHECK_CL_ERROR(clEnqueueCopyBuffer(queue, vec_buffer2, vec_buffer3, 0, 0, sizeof(vector), 0, NULL, NULL));
-    CHECK_CL_ERROR(clEnqueueTask(queue, kn_op_test3, 0, NULL, NULL));
-    memset((void*)vector, 0, sizeof(vector));
-    CHECK_CL_ERROR(clEnqueueReadBuffer(queue, vec_buffer3, CL_TRUE, 0, sizeof(vector), vector, 0, NULL, NULL));
-    printf("output: [0]: %d, [1]: %d, [2]: %d, [3]: %d\n", vector[0], vector[1], vector[2], vector[3]);
+    // Create and set up the third kernel
+    cl_kernel kn_op_test3 = clCreateKernel(program, "op_test3", &err);                                          // Create kernel from the program
+    CHECK_CL_ERROR(err);                                                                                        // Check for errors during kernel creation
+    cl_mem vec_buffer3 = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(vector), NULL, &err);                // Create buffer for the kernel
+    CHECK_CL_ERROR(err);                                                                                        // Check for errors during buffer creation
+    CHECK_CL_ERROR(clSetKernelArg(kn_op_test3, 0, sizeof(cl_mem), &vec_buffer3));                               // Set buffer as kernel argument
+    CHECK_CL_ERROR(clEnqueueCopyBuffer(queue, vec_buffer2, vec_buffer3, 0, 0, sizeof(vector), 0, NULL, NULL));  // Copy data from vec_buffer2 to vec_buffer3
+    CHECK_CL_ERROR(clEnqueueTask(queue, kn_op_test3, 0, NULL, NULL));                                           // Enqueue kernel execution
+    memset((void *)vector, 0, sizeof(vector));                                                                  // Clear the vector
+    CHECK_CL_ERROR(clEnqueueReadBuffer(queue, vec_buffer3, CL_TRUE, 0, sizeof(vector), vector, 0, NULL, NULL)); // Read buffer back to vector
+    printf("output: [0]: %d, [1]: %d, [2]: %d, [3]: %d\n", vector[0], vector[1], vector[2], vector[3]);         // Print the results
 
-    cl_kernel kn_op_test4 = clCreateKernel(program, "op_test4", &err);
-    CHECK_CL_ERROR(err);
-    cl_mem vec_buffer4 = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(vector), NULL, &err);
-    CHECK_CL_ERROR(err);
-    CHECK_CL_ERROR(clSetKernelArg(kn_op_test4, 0, sizeof(cl_mem), &vec_buffer4));
-    CHECK_CL_ERROR(clEnqueueCopyBuffer(queue, vec_buffer3, vec_buffer4, 0, 0, sizeof(vector), 0, NULL, NULL));
-    CHECK_CL_ERROR(clEnqueueTask(queue, kn_op_test4, 0, NULL, NULL));
-    memset((void*)vector, 0, sizeof(vector));
-    CHECK_CL_ERROR(clEnqueueReadBuffer(queue, vec_buffer4, CL_TRUE, 0, sizeof(vector), vector, 0, NULL, NULL));
-    printf("output: [0]: %d, [1]: %d, [2]: %d, [3]: %d\n", vector[0], vector[1], vector[2], vector[3]);
+    // Create and set up the fourth kernel
+    cl_kernel kn_op_test4 = clCreateKernel(program, "op_test4", &err);                                          // Create kernel from the program
+    CHECK_CL_ERROR(err);                                                                                        // Check for errors during kernel creation
+    cl_mem vec_buffer4 = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(vector), NULL, &err);                // Create buffer for the kernel
+    CHECK_CL_ERROR(err);                                                                                        // Check for errors during buffer creation
+    CHECK_CL_ERROR(clSetKernelArg(kn_op_test4, 0, sizeof(cl_mem), &vec_buffer4));                               // Set buffer as kernel argument
+    CHECK_CL_ERROR(clEnqueueCopyBuffer(queue, vec_buffer3, vec_buffer4, 0, 0, sizeof(vector), 0, NULL, NULL));  // Copy data from vec_buffer3 to vec_buffer4
+    CHECK_CL_ERROR(clEnqueueTask(queue, kn_op_test4, 0, NULL, NULL));                                           // Enqueue kernel execution
+    memset((void *)vector, 0, sizeof(vector));                                                                  // Clear the vector
+    CHECK_CL_ERROR(clEnqueueReadBuffer(queue, vec_buffer4, CL_TRUE, 0, sizeof(vector), vector, 0, NULL, NULL)); // Read buffer back to vector
+    printf("output: [0]: %d, [1]: %d, [2]: %d, [3]: %d\n", vector[0], vector[1], vector[2], vector[3]);         // Print the results
 
     // Release OpenCL resources
-    CHECK_CL_ERROR(clReleaseMemObject(vec_buffer4));
-    CHECK_CL_ERROR(clReleaseMemObject(vec_buffer3));
-    CHECK_CL_ERROR(clReleaseMemObject(vec_buffer2));
-    CHECK_CL_ERROR(clReleaseMemObject(vec_buffer1));
-    CHECK_CL_ERROR(clReleaseKernel(kn_op_test4)); // Release kernel
-    CHECK_CL_ERROR(clReleaseKernel(kn_op_test3)); // Release kernel
-    CHECK_CL_ERROR(clReleaseKernel(kn_op_test2)); // Release kernel
-    CHECK_CL_ERROR(clReleaseKernel(kn_op_test1)); // Release kernel
-    CHECK_CL_ERROR(clReleaseCommandQueue(queue)); // Release command queue
-    CHECK_CL_ERROR(clReleaseProgram(program));    // Release program
-    CHECK_CL_ERROR(clReleaseContext(context));    // Release context
+    CHECK_CL_ERROR(clReleaseMemObject(vec_buffer4)); // Release buffer
+    CHECK_CL_ERROR(clReleaseMemObject(vec_buffer3)); // Release buffer
+    CHECK_CL_ERROR(clReleaseMemObject(vec_buffer2)); // Release buffer
+    CHECK_CL_ERROR(clReleaseMemObject(vec_buffer1)); // Release buffer
+    CHECK_CL_ERROR(clReleaseKernel(kn_op_test4));    // Release kernel
+    CHECK_CL_ERROR(clReleaseKernel(kn_op_test3));    // Release kernel
+    CHECK_CL_ERROR(clReleaseKernel(kn_op_test2));    // Release kernel
+    CHECK_CL_ERROR(clReleaseKernel(kn_op_test1));    // Release kernel
+    CHECK_CL_ERROR(clReleaseCommandQueue(queue));    // Release command queue
+    CHECK_CL_ERROR(clReleaseProgram(program));       // Release program
+    CHECK_CL_ERROR(clReleaseContext(context));       // Release context
 
     return EXIT_SUCCESS; // Return success
 }
