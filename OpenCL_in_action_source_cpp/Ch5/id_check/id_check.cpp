@@ -99,10 +99,6 @@ cl::Program build_program(const cl::Context &context, const cl::Device &device, 
     return program;
 }
 
-#include <iostream>
-#include <iomanip>
-#include <CL/cl.hpp> // Include OpenCL C++ bindings
-
 int main(int argc, char **argv)
 {
     try
