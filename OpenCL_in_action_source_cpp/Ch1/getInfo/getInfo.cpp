@@ -1,6 +1,7 @@
 // Enable OpenCL exceptions
-// Set OpenCL version to 1.2
+// Set OpenCL version to 2.0
 #define CL_HPP_TARGET_OPENCL_VERSION 200
+// #define CL_HPP_TARGET_OPENCL_VERSION 300
 // #define __CL_ENABLE_EXCEPTIONS
 #define CL_HPP_ENABLE_EXCEPTIONS
 
