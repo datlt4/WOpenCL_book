@@ -1,5 +1,6 @@
 // Enable OpenCL exceptions
-#define __CL_ENABLE_EXCEPTIONS
+#define CL_HPP_ENABLE_EXCEPTIONS
+#define CL_HPP_TARGET_OPENCL_VERSION 300
 
 #include <vector>   // For using std::vector
 #include <iostream> // For standard input/output
@@ -70,7 +71,8 @@ int main(int argc, char **argv)
         }
     }
 
-    cl::Program::Sources sources(1, std::pair<const char *, size_t>(program_buffer.c_str(), program_buffer.length() + 1));
+    cl::Program::Sources sources;
+    sources.emplace_back(program_buffer.c_str(), program_buffer.length() + 1);
     cl::Program program(context, sources, &err);
     // Build the program
     try

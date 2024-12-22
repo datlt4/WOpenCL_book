@@ -1,4 +1,5 @@
-#define _CRT_SECURE_NO_WARNINGS
+#define CL_HPP_ENABLE_EXCEPTIONS
+#define CL_HPP_TARGET_OPENCL_VERSION 300
 #define PROGRAM_FILE "matvec.cl"
 #define KERNEL_FUNC "matvec_mult"
 

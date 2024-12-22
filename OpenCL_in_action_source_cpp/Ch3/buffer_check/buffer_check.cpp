@@ -1,5 +1,6 @@
 // Enable OpenCL exceptions
-#define __CL_ENABLE_EXCEPTIONS
+#define CL_HPP_ENABLE_EXCEPTIONS
+#define CL_HPP_TARGET_OPENCL_VERSION 300
 
 // Standard C++ headers
 #include <vector>    // For using std::vector
@@ -82,7 +83,8 @@ cl::Program build_program(cl::Context &context, cl::Device &device, const char *
     programFile.close();
 
     // Create OpenCL program from the source code
-    cl::Program::Sources sources(1, std::make_pair(programBuffer.c_str(), programBuffer.length() + 1));
+    cl::Program::Sources sources;
+    sources.emplace_back(programBuffer.c_str(), programBuffer.length() + 1);
     cl::Program program(context, sources);
 
     // Build the OpenCL program

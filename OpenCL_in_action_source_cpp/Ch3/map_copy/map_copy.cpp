@@ -1,5 +1,6 @@
 // Enable OpenCL exceptions
-#define __CL_ENABLE_EXCEPTIONS
+#define CL_HPP_ENABLE_EXCEPTIONS
+#define CL_HPP_TARGET_OPENCL_VERSION 300
 
 // Standard C++ headers
 #include <vector>    // For using std::vector
@@ -157,15 +158,15 @@ int main(int argc, char **argv)
         }
 
         // Perform buffer copy operation using clEnqueueCopyBufferRect
-        cl::size_t<3> src_origin; // The (x in bytes, y in rows, z in slices) offset in the memory region associated with `buffer_one`
+        std::array<size_t, 3> src_origin; // The (x in bytes, y in rows, z in slices) offset in the memory region associated with `buffer_one`
         src_origin[0] = 1 * FLOAT_SIZE;
         src_origin[1] = 1;
         src_origin[2] = 0;
-        cl::size_t<3> dst_origin; // The (x in bytes, y in rows, z in slices) offset in the memory region pointed to by `buffer_two`
+        std::array<size_t, 3> dst_origin; // The (x in bytes, y in rows, z in slices) offset in the memory region pointed to by `buffer_two`
         dst_origin[0] = 1 * FLOAT_SIZE;
         dst_origin[1] = 1;
         dst_origin[2] = 0;
-        cl::size_t<3> region; // The (width in bytes, height in rows, depth in slices) of the 2D or 3D rectangle
+        std::array<size_t, 3> region; // The (width in bytes, height in rows, depth in slices) of the 2D or 3D rectangle
         region[0] = 4 * FLOAT_SIZE;
         region[1] = 4;
         region[2] = 1;
@@ -182,7 +183,7 @@ int main(int argc, char **argv)
          */
         CHECK_CL_ERROR(queue.enqueueUnmapMemObject(buffer_two, mapped_memory));
         std::cout << std::endl;
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < 10; ++i)
         {
             for (int j = 0; j < 10; ++j)
             {

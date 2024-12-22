@@ -1,5 +1,6 @@
 // Enable OpenCL exceptions
-#define __CL_ENABLE_EXCEPTIONS
+#define CL_HPP_ENABLE_EXCEPTIONS
+#define CL_HPP_TARGET_OPENCL_VERSION 300
 
 // Standard C++ headers
 #include <vector>    // For using std::vector
@@ -120,15 +121,15 @@ int main()
 #endif // APPLE
         queue.enqueueWriteBuffer(full_buffer, CL_TRUE, 0, sizeof(full_data), full_data);
 
-        cl::size_t<3> buffer_origin; // The (x in bytes, y in rows, z in slices) offset in the memory region associated with `buffer`
+        std::array<size_t, 3> buffer_origin; // The (x in bytes, y in rows, z in slices) offset in the memory region associated with `buffer`
         buffer_origin[0] = 5 * FLOAT_SIZE;
         buffer_origin[1] = 3;
         buffer_origin[2] = 0;
-        cl::size_t<3> host_origin; // The (x in bytes, y in rows, z in slices) offset in the memory region pointed to by `ptr`.
+        std::array<size_t, 3> host_origin; // The (x in bytes, y in rows, z in slices) offset in the memory region pointed to by `ptr`.
         host_origin[0] = 1 * FLOAT_SIZE;
         host_origin[1] = 1;
         host_origin[2] = 0;
-        cl::size_t<3> region; // The (width in bytes, height in rows, depth in slices) of the 2D or 3D rectangle.
+        std::array<size_t, 3> region; // The (width in bytes, height in rows, depth in slices) of the 2D or 3D rectangle.
         region[0] = 4 * FLOAT_SIZE;
         region[1] = 4;
         region[2] = 1;

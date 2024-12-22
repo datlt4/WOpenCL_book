@@ -1,5 +1,6 @@
 // Enable OpenCL exceptions
-#define __CL_ENABLE_EXCEPTIONS
+#define CL_HPP_ENABLE_EXCEPTIONS
+#define CL_HPP_TARGET_OPENCL_VERSION 300
 
 // Standard C++ headers
 #include <vector>    // For using std::vector

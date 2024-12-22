@@ -1,28 +1,44 @@
-SRCS= matvec.h
-OBJS= matvec.o
-EXEC= matvec
+# Compiler and flags
+CXX=g++
+CC=gcc
+CFLAGS=-std=c11
 
-GCC ?= g++
-CCFLAGS := -std=c++11
+# Project names
+PROJ=matvec
+PROJ_CPP=$(PROJ).cpp_app
+PROJ_C=$(PROJ).c_app
 
-LDFLAGS += -ggdb3 -O2 -Wall -Wextra -pedantic -lOpenCL
+# Detect OS
+UNAME_S := $(shell uname -s)
 
-RM=rm -f
+# Include and library directories and libraries
+ifeq ($(UNAME_S), Linux)
+    CXXFLAGS=-std=c++2a
+    INC_DIRS=-I /usr/local/cuda/include
+    LIB_DIRS=-L /usr/local/cuda/lib64
+    LIBS=-lOpenCL
+    DEFINES=
+else ifeq ($(UNAME_S), Darwin)
+    CXXFLAGS=-std=c++20
+    INC_DIRS=
+    LIB_DIRS=
+    LIBS=-framework OpenCL
+    DEFINES=-DAPPLE
+endif
 
-# Target rules
-all: build
+# Default target to build both applications
+all: $(PROJ_CPP) $(PROJ_C)
 
-build: ${EXEC}
+# Rules for building the C++ application
+$(PROJ_CPP): $(PROJ).cpp
+	$(CXX) $^ -o $@ $(CXXFLAGS) $(LIBS) $(INC_DIRS) $(LIB_DIRS) $(DEFINES)
 
-%.o: %.cpp %.h
-	$(GCC) $(CCFLAGS) $(INCLUDES) -o $@ -c $<
+# Rules for building the C application
+$(PROJ_C): $(PROJ).c
+	$(CC) $^ -o $@ $(CFLAGS) $(LIBS) $(INC_DIRS) $(LIB_DIRS) $(DEFINES)
 
-${EXEC}: ${OBJS}
-	$(GCC) $(CCFLAGS) -o $@ $^ $(LDFLAGS)
+.PHONY: clean
 
+# Clean rule
 clean:
-	${RM} ${EXEC} *.o 
-
-dist-clean:
-	$(RM) $(EXEC)
-
+	rm -f $(PROJ_CPP) $(PROJ_C)

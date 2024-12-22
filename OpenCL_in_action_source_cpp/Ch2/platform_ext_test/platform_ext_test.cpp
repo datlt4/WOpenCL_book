@@ -1,5 +1,6 @@
 // Enable OpenCL exceptions
-#define __CL_ENABLE_EXCEPTIONS
+#define CL_HPP_ENABLE_EXCEPTIONS
+#define CL_HPP_TARGET_OPENCL_VERSION 300
 
 #include <vector>   // For using std::vector
 #include <iostream> // For standard input/output
@@ -27,7 +28,7 @@ int main(int argc, char **argv)
     for (cl::Platform &platform : platforms)
     {
         /* Access extension data */
-        cl::STRING_CLASS param;
+        std::string param;
         platform.getInfo(CL_PLATFORM_EXTENSIONS, &param);
         std::cout << "Platform supports extensions: " << param << std::endl;
 
