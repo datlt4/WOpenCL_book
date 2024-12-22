@@ -45,6 +45,11 @@ add_executable(${PROJECT_NAME}.c_app ${C_SRC})
 # Link the OpenCL library for the C application
 target_link_libraries(${PROJECT_NAME}.c_app ${LIB})
 
+message(STATUS "INC: ${INC}")
+message(STATUS "LIB: ${LIB}")
+message(STATUS "C_SRC: ${C_SRC}")
+message(STATUS "CPP_SRC: ${CPP_SRC}")
+
 # Copy each .cl file to the destination directory
 file(GLOB CL_FILES "${CMAKE_SOURCE_DIR}/*.cl")
 foreach(CL_FILE ${CL_FILES})

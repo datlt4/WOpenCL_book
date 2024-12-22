@@ -1,5 +1,8 @@
 // Enable OpenCL exceptions
-#define __CL_ENABLE_EXCEPTIONS
+// Set OpenCL version to 1.2
+#define CL_HPP_TARGET_OPENCL_VERSION 200
+// #define __CL_ENABLE_EXCEPTIONS
+#define CL_HPP_ENABLE_EXCEPTIONS
 
 #include <vector>   // For using std::vector
 #include <iostream> // For standard input/output
@@ -82,8 +85,8 @@ int main(int argc, char **argv)
             {                                                                                                                                      \
                 std::cout << "\t\t. " << #param << ": " << param_info << " (" << CL_DEVICE_TYPE_DEFAULT << " : CL_DEVICE_TYPE_DEFAULT, "           \
                           << CL_DEVICE_TYPE_CPU << " : CL_DEVICE_TYPE_CPU, " << CL_DEVICE_TYPE_GPU << " : CL_DEVICE_TYPE_GPU, "                    \
-                          << CL_DEVICE_TYPE_ACCELERATOR << " : CL_DEVICE_TYPE_ACCELERATOR" << CL_DEVICE_TYPE_CUSTOM << " : CL_DEVICE_TYPE_CUSTOM)" \
-                          << "other : UNKNOWN" << std::endl;                                                                                       \
+                          << CL_DEVICE_TYPE_ACCELERATOR << " : CL_DEVICE_TYPE_ACCELERATOR" << CL_DEVICE_TYPE_CUSTOM << " : CL_DEVICE_TYPE_CUSTOM, " \
+                          << "other : UNKNOWN)" << std::endl;                                                                                       \
             }                                                                                                                                      \
             else                                                                                                                                   \
             {                                                                                                                                      \
@@ -105,8 +108,8 @@ int main(int argc, char **argv)
                 GET_DEVICE_INFO(CL_DEVICE_OPENCL_C_VERSION);
                 GET_DEVICE_INFO(CL_DEVICE_ADDRESS_BITS);
                 GET_DEVICE_INFO(CL_DEVICE_NAME);
-                GET_DEVICE_INFO(CL_DEVICE_PARENT_DEVICE);
-                GET_DEVICE_INFO(CL_DEVICE_AVAILABLE);
+                // GET_DEVICE_INFO(CL_DEVICE_PARENT_DEVICE);
+                // GET_DEVICE_INFO(CL_DEVICE_AVAILABLE);
                 GET_DEVICE_INFO(CL_DEVICE_BUILT_IN_KERNELS);
                 GET_DEVICE_INFO(CL_DEVICE_COMPILER_AVAILABLE);
                 GET_DEVICE_INFO(CL_DEVICE_DOUBLE_FP_CONFIG);
@@ -123,11 +126,11 @@ int main(int argc, char **argv)
                 GET_DEVICE_INFO(CL_DEVICE_IMAGE3D_MAX_DEPTH);
                 GET_DEVICE_INFO(CL_DEVICE_IMAGE3D_MAX_HEIGHT);
                 GET_DEVICE_INFO(CL_DEVICE_IMAGE3D_MAX_WIDTH);
-                // GET_DEVICE_INFO(CL_DEVICE_IMAGE_MAX_ARRAY_SIZE);
-                // GET_DEVICE_INFO(CL_DEVICE_IMAGE_MAX_BUFFER_SIZE);
-                // GET_DEVICE_INFO(CL_DEVICE_IMAGE_PITCH_ALIGNMENT);
+                GET_DEVICE_INFO(CL_DEVICE_IMAGE_MAX_ARRAY_SIZE);
+                GET_DEVICE_INFO(CL_DEVICE_IMAGE_MAX_BUFFER_SIZE);
+                GET_DEVICE_INFO(CL_DEVICE_IMAGE_PITCH_ALIGNMENT);
                 GET_DEVICE_INFO(CL_DEVICE_IMAGE_SUPPORT);
-                // GET_DEVICE_INFO(CL_DEVICE_LINKER_AVAILABLE);
+                GET_DEVICE_INFO(CL_DEVICE_LINKER_AVAILABLE);
                 GET_DEVICE_INFO(CL_DEVICE_LOCAL_MEM_SIZE);
                 GET_DEVICE_INFO(CL_DEVICE_LOCAL_MEM_TYPE);
                 GET_DEVICE_INFO(CL_DEVICE_MAX_CLOCK_FREQUENCY);
@@ -144,11 +147,11 @@ int main(int argc, char **argv)
                 GET_DEVICE_INFO(CL_DEVICE_MAX_WRITE_IMAGE_ARGS);
                 GET_DEVICE_INFO(CL_DEVICE_MEM_BASE_ADDR_ALIGN);
                 GET_DEVICE_INFO(CL_DEVICE_PARTITION_AFFINITY_DOMAIN);
-                // GET_DEVICE_INFO(CL_DEVICE_PARTITION_MAX_SUB_DEVICES);
+                GET_DEVICE_INFO(CL_DEVICE_PARTITION_MAX_SUB_DEVICES);
                 // GET_DEVICE_INFO(CL_DEVICE_PARTITION_PROPERTIES);
                 // GET_DEVICE_INFO(CL_DEVICE_PARTITION_TYPE);
-                GET_DEVICE_INFO(CL_DEVICE_PLATFORM);
-                // GET_DEVICE_INFO(CL_DEVICE_PRINTF_BUFFER_SIZE);
+                // GET_DEVICE_INFO(CL_DEVICE_PLATFORM);
+                GET_DEVICE_INFO(CL_DEVICE_PRINTF_BUFFER_SIZE);
                 GET_DEVICE_INFO(CL_DEVICE_PROFILE);
                 GET_DEVICE_INFO(CL_DEVICE_PROFILING_TIMER_RESOLUTION);
                 GET_DEVICE_INFO(CL_DEVICE_REFERENCE_COUNT);
