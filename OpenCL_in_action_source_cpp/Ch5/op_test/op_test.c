@@ -10,6 +10,9 @@
 #include <sys/types.h> // For defining data types
 #include <inttypes.h>  // For printing fixed-width integer types
 #include <string.h>    // For string manipulation functions
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef __APPLE__
 #include <OpenCL/cl.h> // Include OpenCL headers for macOS
@@ -169,11 +172,6 @@ cl_program build_program(const cl_context *context, const cl_device_id *device, 
 
     return program;
 }
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <CL/cl.h>
 
 int main(int argc, char **argv)
 {
